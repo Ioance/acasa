@@ -1,0 +1,578 @@
+/* This file contains the CSS styles for the website, defining the layout, colors, fonts, and overall appearance. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+    font-family: 'Inter', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f9fb;
+    color: #222;
+}
+
+.top-bar {
+    background: #38598b;
+    color: #fff;
+    text-align: right;
+    padding: 6px 30px;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
+
+.main-header {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 0 0 0 0;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    flex: 0 0 auto;
+}
+
+.logo img {
+    height: 40px;
+    border-radius: 50%;
+    margin: 10px 0 10px 20px;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0 32px;
+    align-items: center;
+}
+
+.main-nav a {
+    position: relative;
+    text-decoration: none;
+    color: #38598b; /* blue */
+    font-weight: 700;
+    font-size: 1.1em;
+    padding-bottom: 6px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s;
+    overflow: hidden;
+}
+
+.main-nav a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #e4572e;
+    transition: all 0.3s cubic-bezier(.4,1.5,.5,1);
+    transform: translateX(-50%);
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    color: #092042; /* dark blue on hover */
+}
+
+.main-nav a:hover::after,
+.main-nav a.active::after {
+    width: 100%;
+    background: #38598b;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: 20px;
+}
+
+.header-icons .icon {
+    font-size: 1.3em;
+    cursor: pointer;
+    color: #35424a;
+    transition: color 0.2s;
+}
+
+.header-icons .icon:hover {
+    color:  #092042;
+}
+
+.lang-select {
+    margin-left: 20px;
+}
+
+.lang-select select {
+    border: none;
+    background: transparent;
+    font-size: 1em;
+    color: #35424a;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+h1, h2, h3 {
+    color: #35424a;
+}
+
+.theory-content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    margin: 40px auto 0 auto;
+    padding: 36px 40px 40px 40px;
+    max-width: 900px;
+    font-size: 1em; /* font mai mic */
+}
+
+.theory-content h2 {
+    font-size: 2em;
+    margin-bottom: 24px;
+    color: #2d4059;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theory-content h3 {
+    color: #38598b;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    font-size: 1.25em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theory-content ul {
+    margin-left: 28px;
+    margin-bottom: 16px;
+}
+
+/* Blocuri de cod pe mai multe linii */
+.theory-content pre {
+    background: #f3f6fa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.97em;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    color: #1a3a5c;
+    margin-bottom: 22px;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-word;
+    box-shadow: 0 4px 18px rgba(44, 62, 80, 0.10), 0 1.5px 4px rgba(44,62,80,0.07);
+    border: 1px solid #e3e8ee;
+    transition: box-shadow 0.2s;
+}
+
+.theory-content pre:hover {
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.16), 0 2px 8px rgba(44,62,80,0.10);
+    border-color: #b2becd;
+}
+
+/* Cod inline (ex: #include <fstream>) */
+.theory-content code {
+    background: #f3f6fa;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.97em;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    color: #1a3a5c;
+    border: 1px solid #e3e8ee;
+    box-shadow: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.theory-content pre {
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+/* Pentru a evita spațiul prea mare între blocuri de cod și text */
+.theory-content p {
+    margin-top: 0.7em;
+    margin-bottom: 0.7em;
+}
+
+.theory-content img {
+    max-width: 90%;
+    width: 600px;
+    display: block;
+    margin: 32px auto 32px auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.theory-content strong {
+    color: #000000;
+}
+
+.card {
+    background: #e3f6f5;
+    border-left: 5px solid #3aafa9;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 1.08em;
+}
+
+/* Elimină footerul cu copyright */
+footer {
+    display: none;
+}
+
+.category-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 40px auto;
+    max-width: 600px;
+}
+
+.category-btn {
+    flex: 1;
+    margin: 0 10px;
+    padding: 30px 0;
+    background: #35424a;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.3em;
+    border-radius: 8px;
+    transition: background 0.3s;
+    font-weight: bold;
+}
+
+.category-btn:hover {
+    background: #092042;
+}
+
+.category-btn.left {
+    margin-left: 0;
+}
+
+.category-btn.right {
+    margin-right: 0;
+}
+
+.test-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px auto 0 auto;
+    max-width: 900px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding-bottom: 32px;
+}
+
+/* Uniformizează fontul și dimensiunea pentru pagina Test */
+.test-content,
+.test-actions,
+.test-content h1,
+.test-content h2,
+.test-content h3,
+.test-actions h1,
+.test-actions h2,
+.test-actions h3 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1em;
+    color: #222;
+    font-weight: 400;
+}
+
+.test-content h1,
+.test-actions h1 {
+    font-size: 2em;
+    font-weight: 700;
+    color: #2d4059;
+}
+
+.test-content h2,
+.test-actions h2 {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: #38598b;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    padding: 7px 20px;
+    background: #38598b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background 0.2s, transform 0.2s;
+    z-index: 2;
+}
+.copy-btn:hover {
+    background: #092042;
+    transform: scale(1.07);
+}
+
+/* Hero Section */
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 420px; /* adjust as needed */
+    z-index: 0;
+    background: url('https://cdn.discordapp.com/attachments/1244332449874579600/1375560039225495724/unnamed.jpg?ex=6832219e&is=6830d01e&hm=88af5df4a68563150082c0bdeabc0e2cfaeb12d566dd38a3243cf51e936ab918&') center center/cover no-repeat;
+    opacity: 0.18; /* adjust for effect */
+    pointer-events: none; /* so it doesn't block clicks */
+}
+
+.landing-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Adaugă la finalul <style> sau în styles.css */
+.dark-toggle-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    background: #38598b;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.dark-toggle-btn:hover {
+    background: #092042;
+}
+body.dark-mode .dark-toggle-btn {
+    background: #e4572e;
+    color: #fff;
+}
+
+/* DARK MODE - Contrast și vizibilitate îmbunătățite */
+body.dark-mode {
+    background: #181c24 !important;
+    color: #e7eaf6 !important;
+}
+
+body.dark-mode .theory-content,
+body.dark-mode .test-content,
+body.dark-mode .test-actions {
+    background: #23293a !important;
+    color: #e7eaf6 !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode strong,
+body.dark-mode .theory-content h2,
+body.dark-mode .theory-content h3 {
+    color: #ffed85 !important;
+}
+
+body.dark-mode .main-header,
+body.dark-mode .main-nav ul {
+    background: #23293a !important;
+}
+
+body.dark-mode .main-nav a {
+    color: #e7eaf6 !important;
+}
+
+body.dark-mode .main-nav a.active,
+body.dark-mode .main-nav a:hover {
+    color: #ffed85 !important;
+}
+
+body.dark-mode .main-nav a::after,
+body.dark-mode .main-nav a.active::after,
+body.dark-mode .main-nav a:hover::after {
+    background: #ffed85 !important;
+}
+
+body.dark-mode .breadcrumbs a,
+body.dark-mode .breadcrumbs span {
+    color: #ffed85 !important;
+}
+
+body.dark-mode .theory-content pre,
+body.dark-mode .theory-content code {
+    background: #181c24 !important;
+    color: #ffed85 !important;
+    border-color: #444a5a !important;
+}
+
+body.dark-mode .copy-btn {
+    background: #e4572e !important;
+    color: #fff !important;
+}
+
+body.dark-mode .copy-btn:hover {
+    background: #38598b !important;
+}
+
+body.dark-mode .tip-card,
+body.dark-mode .card {
+    background: #23293a !important;
+    border-left: 5px solid #e4572e !important;
+    color: #e7eaf6 !important;
+}
+
+body.dark-mode .category-btn {
+    background: #23293a !important;
+    color: #ffed85 !important;
+}
+
+body.dark-mode .category-btn:hover {
+    background: #e4572e !important;
+    color: #fff !important;
+}
+
+body.dark-mode .test-content,
+body.dark-mode .test-actions {
+    color: #e7eaf6 !important;
+}
+
+body.dark-mode .theory-content img {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border: 1px solid #444a5a;
+}
+
+/* DARK MODE pentru Probleme Rezolvate și Test */
+body.dark-mode .problem-content,
+body.dark-mode .solved-content,
+body.dark-mode .test-content,
+body.dark-mode .test-actions {
+    background: #23293a !important;
+    color: #e7eaf6 !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+}
+
+body.dark-mode .problem-content h1,
+body.dark-mode .problem-content h2,
+body.dark-mode .problem-content h3,
+body.dark-mode .solved-content h1,
+body.dark_mode .solved-content h2,
+body.dark_mode .solved-content h3,
+body.dark_mode .test-content h1,
+body.dark_mode .test-content h2,
+body.dark_mode .test-content h3,
+body.dark_mode .test-actions h1,
+body.dark_mode .test-actions h2,
+body.dark_mode .test-actions h3 {
+    color: #ffed85 !important;
+}
+
+body.dark-mode .problem-content pre,
+body.dark-mode .problem-content code,
+body.dark-mode .solved-content pre,
+body.dark-mode .solved-content code,
+body.dark-mode .test-content pre,
+body.dark-mode .test-content code {
+    background: #181c24 !important;
+    color: #ffed85 !important;
+    border-color: #444a5a !important;
+}
+
+body.dark-mode .problem-content .copy-btn,
+body.dark-mode .solved-content .copy-btn,
+body.dark-mode .test-content .copy-btn {
+    background: #e4572e !important;
+    color: #fff !important;
+}
+
+body.dark-mode .problem-content .copy-btn:hover,
+body.dark-mode .solved-content .copy-btn:hover,
+body.dark-mode .test-content .copy-btn:hover {
+    background: #38598b !important;
+}
+
+body.dark-mode .problem-content .tip-card,
+body.dark-mode .solved-content .tip-card,
+body.dark-mode .test-content .tip-card {
+    background: #23293a !important;
+    border-left: 5px solid #e4572e !important;
+    color: #e7eaf6 !important;
+}
+
+body.dark-mode .problem-content img,
+body.dark-mode .solved-content img,
+body.dark-mode .test-content img {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    border: 1px solid #444a5a;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .theory-content {
+        padding: 20px 8px 24px 8px;
+    }
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 0 0 0;
+    }
+    .main-nav ul {
+        gap: 18px;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 700px) {
+    .theory-content pre, .theory-content code {
+        font-size: 0.92em;
+        padding: 8px 6px;
+    }
+}
+body.dark-mode .probleme-content {
+    background: #23293a !important;
+    color: #e7eaf6 !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.22) !important;
+}
+
+body.dark-mode .probleme-content h1,
+body.dark-mode .probleme-content h2,
+body.dark-mode .probleme-content h3,
+body.dark-mode .probleme-content strong {
+    color: #ffed85 !important;
+}
+
+body.dark-mode .probleme-content img {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25) !important;
+    border: 1px solid #444a5a !important;
+}

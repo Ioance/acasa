@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule 1 - Clasa de Informatică 3D</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin:0; background:#e7eaf6; color:#222; font-family:'Inter',Arial,sans-serif; }
+    #game-canvas { width:100vw; height:100vh; display:block; background:#e7eaf6; }
+    #hud {
+      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.95); border-radius: 12px; padding: 18px 32px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10); z-index: 10; min-width: 320px;
+      text-align: center; font-size: 1.2em; display: none;
+    }
+    #hud button { margin-top: 18px; font-size: 1.1em; padding: 8px 24px; border-radius: 8px; border:none; background:#38598b; color:#fff; cursor:pointer; font-weight:600; }
+    #hud button:hover { background:#e4572e; }
+    #blackboard {
+      position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+      width: 420px; height: 120px; background: #23293a; color: #fff;
+      border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2em; font-family: 'Fira Mono', monospace; z-index: 20;
+      letter-spacing: 2px; text-align: center;
+      border: 4px solid #38598b;
+      display: none;
+    }
+    #score { position:absolute; top:18px; right:32px; font-size:1.1em; color:#38598b; z-index:10; }
+    #game-over { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.98); padding:40px 60px; border-radius:18px; text-align:center; z-index:20; }
+    #game-over h2 { color:#e4572e; }
+    #game-over button { margin-top:18px; font-size:1.1em; padding:8px 24px; border-radius:8px; border:none; background:#38598b; color:#fff; cursor:pointer; font-weight:600; }
+    #game-over button:hover { background:#e4572e; }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  <div id="hud">
+    <div id="question"></div>
+    <div id="answers"></div>
+  </div>
+  <div id="blackboard"></div>
+  <div id="score">Scor: <span id="score-value">0</span></div>
+  <div id="game-over">
+    <h2>Joc terminat!</h2>
+    <div id="final-score"></div>
+    <button onclick="location.reload()">Reîncearcă</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    // Întrebări profesoară
+    const questions = [
+      {
+        q: "Ce este un vector în C++?",
+        a: ["O structură de date ce stochează elemente de același tip în memorie contiguă.", "O funcție matematică.", "Un tip de buclă.", "Un operator logic."],
+        c: 0
+      },
+      {
+        q: "Ce face instrucțiunea 'break' într-o buclă?",
+        a: ["Oprește complet bucla.", "Sare la începutul buclei.", "Ignoră următoarea instrucțiune.", "Nu are efect."],
+        c: 0
+      },
+      {
+        q: "Care este rezultatul expresiei 7 % 3 în C++?",
+        a: ["1", "2", "0", "3"],
+        c: 1
+      },
+      {
+        q: "Ce structură de date funcționează LIFO?",
+        a: ["Coada", "Stiva", "Vector", "Arbore"],
+        c: 1
+      },
+      {
+        q: "Ce instrucțiune citește un șir de caractere cu spații în C++?",
+        a: ["cin", "getline", "scanf", "readline"],
+        c: 1
+      },
+      {
+        q: "Ce tip de date folosești pentru valori adevărat/fals?",
+        a: ["int", "bool", "char", "float"],
+        c: 1
+      }
+    ];
+    // 3D setup
+    let scene, camera, renderer, controls, player, teacher, classmates = [], clock, score = 0, questionIdx = 0, answered = false, gameOver = false;
+    const canvas = document.getElementById('game-canvas');
+    function init3D() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+      renderer.setClearColor(0xe7eaf6);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      // Floor
+      const floorGeo = new THREE.BoxGeometry(30,0.1,30);
+      const floorMat = new THREE.MeshStandardMaterial({color:0xdbeafe});
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.position.set(0,-0.5,0);
+      scene.add(floor);
+      // Player (elev)
+      const playerGeo = new THREE.CylinderGeometry(0.5,0.5,1.5,16);
+      const playerMat = new THREE.MeshStandardMaterial({color:0x38598b});
+      player = new THREE.Mesh(playerGeo, playerMat);
+      player.position.set(0,0.75,10);
+      scene.add(player);
+      // Teacher (profesoara)
+      const teacherGeo = new THREE.CylinderGeometry(0.6,0.6,1.7,16);
+      const teacherMat = new THREE.MeshStandardMaterial({color:0xe4572e});
+      teacher = new THREE.Mesh(teacherGeo, teacherMat);
+      teacher.position.set(0,0.85,-10);
+      scene.add(teacher);
+      // Classmates
+      for(let i=-2;i<=2;i++){
+        if(i===0) continue;
+        const mateGeo = new THREE.CylinderGeometry(0.5,0.5,1.5,16);
+        const mateMat = new THREE.MeshStandardMaterial({color:0x7b9acc});
+        const mate = new THREE.Mesh(mateGeo, mateMat);
+        mate.position.set(i*2,0.75,8+Math.random()*2);
+        scene.add(mate);
+        classmates.push(mate);
+      }
+      // Light
+      const light = new THREE.DirectionalLight(0xffffff, 1.1);
+      light.position.set(0,10,10);
+      scene.add(light);
+      camera.position.set(0,5,20);
+      camera.lookAt(0,0,0);
+      clock = new THREE.Clock();
+    }
+    function movePlayer(dir) {
+      if(gameOver) return;
+      if(dir==='left') player.position.x = Math.max(-4, player.position.x-2);
+      if(dir==='right') player.position.x = Math.min(4, player.position.x+2);
+      if(dir==='forward') player.position.z = Math.max(-8, player.position.z-2);
+      if(dir==='back') player.position.z = Math.min(12, player.position.z+2);
+    }
+    function askQuestion() {
+      answered = false;
+      document.getElementById('hud').style.display = 'block';
+      document.getElementById('question').textContent = questions[questionIdx].q;
+      const answersDiv = document.getElementById('answers');
+      answersDiv.innerHTML = '';
+      questions[questionIdx].a.forEach((ans,i)=>{
+        const btn = document.createElement('button');
+        btn.textContent = ans;
+        btn.onclick = ()=>{
+          if(answered) return;
+          answered = true;
+          if(i===questions[questionIdx].c){
+            score++;
+            document.getElementById('score-value').textContent = score;
+            document.getElementById('hud').style.display='none';
+            questionIdx = (questionIdx+1)%questions.length;
+          } else {
+            document.getElementById('hud').style.display='none';
+            showBlackboard('Nota '+(Math.floor(Math.random()*5)+3));
+            setTimeout(()=>{
+              document.getElementById('game-over').style.display='block';
+              document.getElementById('final-score').textContent = 'Scor final: '+score;
+            }, 1800);
+          }
+        };
+        answersDiv.appendChild(btn);
+      });
+    }
+    function showBlackboard(text) {
+      const bb = document.getElementById('blackboard');
+      bb.textContent = text;
+      bb.style.display = 'flex';
+      setTimeout(()=>{ bb.style.display = 'none'; }, 1500);
+    }
+    function animate() {
+      if(gameOver) return;
+      requestAnimationFrame(animate);
+      // Profesoara se apropie de elev
+      if(teacher.position.z < player.position.z-2) {
+        teacher.position.z += 0.04;
+      } else if(!answered) {
+        askQuestion();
+      }
+      // Omuletii (colegi) se mișcă ușor stânga-dreapta
+      classmates.forEach((mate,i)=>{
+        mate.position.x += Math.sin(Date.now()/700 + i)*0.01;
+      });
+      renderer.render(scene, camera);
+    }
+    // Controls
+    window.addEventListener('keydown',function(e){
+      if(gameOver) return;
+      if(e.key==='a'||e.key==='ArrowLeft') movePlayer('left');
+      if(e.key==='d'||e.key==='ArrowRight') movePlayer('right');
+      if(e.key==='w'||e.key==='ArrowUp') movePlayer('forward');
+      if(e.key==='s'||e.key==='ArrowDown') movePlayer('back');
+    });
+    // Start game
+    init3D();
+    animate();
+  </script>
+</body>
+</html>

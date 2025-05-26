@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probleme Rezolvate</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .probleme-content {
+            max-width: 850px;
+            margin: 40px auto 0 auto;
+            padding: 32px 36px 36px 36px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .probleme-content img {
+            max-width: 90%;
+            width: 600px;
+            display: block;
+            margin: 32px auto 32px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            cursor: zoom-in;
+        }
+        .probleme-content h2,
+        .probleme-content h3 {
+            color: #2d4059; /* același albastru ca pe index */
+            font-weight: 700;
+        }
+
+        .probleme-content h1 {
+            color: #2d4059;
+            font-weight: 700;
+        }
+
+        .probleme-content strong {
+            color: #2d4059;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="index.html" title="Înapoi la meniul principal">
+                <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375545958569480333/d135f00b-be77-4a82-b7bb-27f5e79c1489.jpg?ex=68321480&is=6830c300&hm=cf196dd41016349c0a8d90dc4d9a177b5ff588a62ecdb84b915325c38ee385f8&" alt="Logo" height="120" style="cursor:pointer; border:none;">
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="theory.html" id="nav-theory">Teorie</a></li>
+                <li><a href="problemerezolvate.html" id="nav-probleme">Probleme Rezolvate</a></li>
+                <li><a href="test.html" id="nav-test">Test</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="probleme-content">
+            <h2>📥 Se citește un vector cu n elemente întregi.</h2>
+            <p>
+                🔢 Să se ordoneze descrescător după numărul de divizori ai fiecărui element.<br>
+                📌 Dacă două numere au același număr de divizori, se păstrează ordinea inițială dintre ele.
+            </p>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375190805324627989/image.png?ex=6830c9bd&is=682f783d&hm=24cce23d21dc068e0500f59d05d37477cb477ef8dbbba0a9fe39edc8d53dd711&" alt="Exemplu sortare vector după divizori">
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375191601915101375/image.png?ex=6830ca7b&is=682f78fb&hm=74cac39fffc27c8afd54c7ca67b16ca0c0c243d94f120626d40c7ebf9939a85f&" alt="Rezolvare sortare vector după divizori">
+        </section>
+        <!-- Cerință pentru palindrom -->
+        <section class="probleme-content">
+            <h2>🔎 Sa se afiseze toate numerele palindrom care au exact K cifre numere prime</h2>
+            <!-- Poza cu codul palindrom -->
+            <img src="https://media.discordapp.net/attachments/1244332449874579600/1375767058322817134/image.png?ex=6832e26b&is=683190eb&hm=66e6218c2ceadbacd2e1de2a908a415bbe113641befd39fd8e07509259fdf285&=&format=webp&quality=lossless&width=1592&height=864" alt="Cod palindrom K cifre numere prime">
+            <!-- Poza nouă, adaugă aici linkul sau numele fișierului tău -->
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375767642463273040/image.png?ex=6832e2f6&is=68319176&hm=9b1a56fa1175d1e1b344c86e852a9d57e451e6eb6ea5668f10ac6b9591f7d3c5&" alt="Cod palindrom K cifre numere prime">
+            <h3 style="margin-top:32px;">Ce este un palindrom?</h3>
+            <p>
+                Un palindrom este un număr care se citește la fel de la stânga la dreapta și de la dreapta la stânga (ex: 121, 787, 2332).
+            </p>
+        </section>
+        <!-- Cerință și poze pentru problema cu prima cifră primă -->
+        <section class="probleme-content">
+            <h2>🔢 Se citesc n numere, să se afișeze câte dintre acestea au prima cifră un număr prim</h2>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375771353990303795/image.png?ex=6832e66b&is=683194eb&hm=4f5ba115e0c5f260586b6855f7fc1612c21269baf665b1fa7e45998f4cec6baf&" alt="Exemplu cod prima cifra primă" class="zoomable">
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375772397105582131/image.png?ex=6832e764&is=683195e4&hm=a5132168f18e020d3bc7b9aef1b7c67ac951c37cedc8248c67e075dfb59e7254&" alt="Exemplu rulare prima cifra primă" class="zoomable">
+            <p style="margin-top:24px;">
+                <strong>Explicație consola</strong><br>
+                Numerele care au prima cifră primă sunt: 73 (7), 25 (2), 38 (3) &rarr; 3 numere.
+            </p>
+        </section>
+        <section class="probleme-content">
+            <h2>🧮 Se dă un număr natural n. Să se genereze primii n termeni ai șirului lui Fibonacci și să se afișeze câți dintre aceștia au exact d divizori.</h2>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375774350216790087/image.png?ex=6832e935&is=683197b5&hm=15e3684f0f2391f41f56301c713bb20470bf487970355856519f6713a6597a92&" alt="Exemplu cod și rezultat Fibonacci cu d divizori">
+        </section>
+        <!-- SUBIECTE BAC SECTION -->
+        <section class="probleme-content">
+            <h2>🎓 Subiecte BAC Informatica</h2>
+            <p>În această secțiune găsești subiecte de Bacalaureat la informatică, modele de rezolvare și resurse utile pentru pregătire.</p>
+            <h3 id="bac2020">Model BAC 2020 Matematica-Informatica</h3>
+            <p>Poți vizualiza sau descărca subiectul de <a href="https://drive.google.com/file/d/1j8b12HnoEDD7_9AuGuOiJZs6cgSSHJDC/view" target="_blank" style="color:#3867d6; font-weight:600;">aici (Google Drive)</a>.</p>
+            <h3 id="barem2020">Barem BAC 2020</h3>
+            <p>Poți vizualiza sau descărca baremul de <a href="https://drive.google.com/file/d/1mAcWFPyPHfExWsP75DgYa5c6D91fk-mK/view" target="_blank" style="color:#3867d6; font-weight:600;">aici (Google Drive)</a>.</p>
+            <h3 id="bac2018">Model BAC 2018 Matematica-Informatica</h3>
+            <p>Poți vizualiza sau descărca subiectul de <a href="https://drive.google.com/file/d/1jnvQfMNK_sWQvmzoyPixWo_jfVZ9LWgm/view" target="_blank" style="color:#3867d6; font-weight:600;">aici (Google Drive)</a>.</p>
+            <h3 id="barem2018">Model BAC 2018(stiinte ale naturii)</h3>
+            <p>Poți vizualiza sau descărca baremul de <a href="https://drive.google.com/file/d/1aLJjAkshcubzlJE8yXCjMgoKNZTneUSy/view" target="_blank" style="color:#3867d6; font-weight:600;">aici (Google Drive)</a>.</p>
+            <h3 id="bac2009">100 de variante BAC 2009 (intensiv)</h3>
+            <p>Descarcă un PDF cu 100 de variante de Bacalaureat din anul 2009(intensiv), profil matematică-informatică intensiv, de <a href="https://xn--doro-txb.eu/bacinfo_/E_informatica_C.pdf" target="_blank" style="color:#3867d6; font-weight:600;">aici</a>.</p>
+        </section>
+        <!-- END BAC SECTION -->
+    </main>
+    <!-- FAQ Section -->
+    <footer style="margin-top:48px; text-align:center;">
+      <a href="faq.html" title="FAQ Informatică Bacalaureat" style="font-size:1.25em; text-decoration:none; color:#38598b; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+        <span style="font-size:1.5em;">🔍</span> FAQ Informatică Bacalaureat
+      </a>
+    </footer>
+    <script>
+    // Active nav underline fix
+    (function() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+      if (path.endsWith('theory.html')) {
+        document.getElementById('nav-theory').classList.add('active');
+      } else if (path.endsWith('problemerezolvate.html')) {
+        document.getElementById('nav-probleme').classList.add('active');
+      } else if (path.endsWith('test.html')) {
+        document.getElementById('nav-test').classList.add('active');
+      }
+    })();
+    // Zoom image on click, close on outside click
+    (function() {
+      function createModal(imgSrc) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.background = 'rgba(0,0,0,0.8)';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.zIndex = 9999;
+        modal.style.cursor = 'zoom-out';
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.style.maxWidth = '90vw';
+        img.style.maxHeight = '90vh';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 2px 16px rgba(0,0,0,0.25)';
+        img.style.background = '#fff';
+        img.alt = '';
+        modal.appendChild(img);
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+        document.body.appendChild(modal);
+      }
+      document.querySelectorAll('.probleme-content img').forEach(function(img) {
+        img.classList.add('zoomable');
+        img.addEventListener('click', function() {
+          createModal(img.src);
+        });
+      });
+    })();
+    </script>
+</body>
+</html>

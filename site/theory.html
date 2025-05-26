@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teorie - Platformă Informatică pentru Elevi</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f7f9fb;
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .main-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.07);
+            z-index: 100;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+        }
+        .logo img {
+            height: 48px;
+            border-radius: 50%;
+            margin: 8px 0 8px 0;
+        }
+        .main-nav ul {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            margin: 0;
+            padding: 0 32px;
+            align-items: center;
+        }
+        .main-nav a {
+            position: relative;
+            text-decoration: none;
+            color: #38598b;
+            font-weight: 700;
+            font-size: 1.1em;
+            padding-bottom: 6px;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s;
+        }
+        .main-nav a.active,
+        .main-nav a:hover {
+            color: #092042;
+        }
+        .main-nav a.active::after,
+        .main-nav a:hover::after {
+            width: 100%;
+            background: #38598b;
+        }
+        .main-nav a::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: #e4572e;
+            transition: all 0.3s cubic-bezier(.4,1.5,.5,1);
+            transform: translateX(-50%);
+        }
+        .breadcrumbs {
+            font-size: 0.95em;
+            color: #38598b;
+            margin: 80px 0 0 24px;
+        }
+        .breadcrumbs a {
+            color: #38598b;
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+        main {
+            margin-top: 40px;
+        }
+        .theory-content {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.08);
+            padding: 32px 24px;
+            margin: 32px auto;
+            max-width: 800px;
+            transition: box-shadow 0.2s;
+            font-size: 1.08em;
+            line-height: 1.7;
+        }
+        .theory-content h2 {
+            font-size: 2em;
+            margin-bottom: 24px;
+            color: #2d4059;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .theory-content h3 {
+            color: #38598b;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            font-size: 1.25em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .theory-content ul {
+            margin-left: 28px;
+            margin-bottom: 16px;
+        }
+        .theory-content pre {
+            background: #f3f6fa;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 0.97em;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            color: #1a3a5c;
+            margin-bottom: 22px;
+            overflow-x: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            word-break: break-word;
+            box-shadow: 0 4px 18px rgba(44, 62, 80, 0.10), 0 1.5px 4px rgba(44,62,80,0.07);
+            border: 1px solid #e3e8ee;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+        .theory-content pre:hover {
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.16), 0 2px 8px rgba(44,62,80,0.10);
+            border-color: #b2becd;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            padding: 7px 20px;
+            background: #38598b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: background 0.2s, transform 0.2s;
+            z-index: 2;
+        }
+        .copy-btn:hover {
+            background: #092042;
+            transform: scale(1.07);
+        }
+        .tip-card {
+            background: #e7eaf6;
+            border-left: 5px solid #38598b;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-size: 1em;
+        }
+        .theory-content img {
+            max-width: 90%;
+            width: 600px;
+            display: block;
+            margin: 32px auto 32px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            cursor: zoom-in;
+        }
+        @media (max-width: 900px) {
+            .theory-content {
+                padding: 16px 6px;
+                margin: 16px 2px;
+            }
+            .main-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0 0 0 0;
+                height: auto;
+            }
+            .main-nav ul {
+                gap: 18px;
+                padding: 0 10px;
+            }
+            .logo img {
+                margin-left: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-header { height: 48px; padding: 0 8px; }
+            body { padding-top: 48px; }
+            .theory-content pre, .theory-content code {
+                font-size: 0.92em;
+                padding: 8px 6px;
+            }
+            .theory-content img {
+                width: 98vw;
+                max-width: 98vw;
+            }
+        }
+        /* Dark mode */
+        body.dark-mode {
+            background: #181c24;
+            color: #e7eaf6;
+        }
+        body.dark-mode .theory-content {
+            background: #23293a;
+            color: #e7eaf6;
+        }
+        body.dark-mode .tip-card {
+            background: #23293a;
+            border-left: 5px solid #e4572e;
+            color: #e7eaf6;
+        }
+        body.dark-mode .main-header,
+        body.dark-mode .main-nav ul,
+        body.dark-mode .main-nav a {
+            background: #23293a;
+            color: #e7eaf6;
+        }
+        body.dark-mode .main-nav a.active,
+        body.dark-mode .main-nav a:hover {
+            color: #fff;
+        }
+        body.dark-mode .copy-btn {
+            background: #e4572e;
+            color: #fff;
+        }
+        body.dark-mode .copy-btn:hover {
+            background: #38598b;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="index.html" title="Înapoi la meniul principal">
+                <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375545958569480333/d135f00b-be77-4a82-b7bb-27f5e79c1489.jpg?ex=68321480&is=6830c300&hm=cf196dd41016349c0a8d90dc4d9a177b5ff588a62ecdb84b915325c38ee385f8&" alt="Logo">
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="theory.html" id="nav-theory">Teorie</a></li>
+                <li><a href="problemerezolvate.html" id="nav-probleme">Probleme Rezolvate</a></li>
+                <li><a href="test.html" id="nav-test">Test</a></li>
+            </ul>
+        </nav>
+    </header>
+    <nav class="breadcrumbs">
+        <a href="index.html">Acasă</a> &gt; <span>Teorie</span>
+    </nav>
+    <main>
+        <section class="theory-content">
+            <h2>📚 Capitol: Divizibilitatea – Aplicații în programare</h2>
+            <div class="tip-card">
+                <strong>Știai că?</strong> Divizibilitatea este una dintre cele mai frecvente teme la olimpiade și concursuri!
+            </div>
+            <h3>1. Noțiuni de bază – „Divizibilitatea în C++”</h3>
+            <p>
+                <b>Definiție:</b><br>
+                Un număr <i>a</i> se spune că este divizibil cu <i>b</i> dacă restul împărțirii lui <i>a</i> la <i>b</i> este 0.
+            </p>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184059919110226/image.png?ex=6832bdb5&is=68316c35&hm=72b37b79b1bab5041e9e94343dd354015f016c338dc3a92b4ceee01b5ed1fbcd&" alt="Divizibilitate exemplu 1" class="zoomable">
+            <p>
+                <b>Exemple:</b>
+                <ul>
+                    <li>Afișează dacă un număr este divizibil cu 2, 3 și 5.</li>
+                    <li>Verifică dacă un număr întreg este divizibil cu suma cifrelor lui.</li>
+                    <li>Divizibilitate în vectori</li>
+                </ul>
+                <b>Exerciții frecvente:</b>
+                <ul>
+                    <li>Numără câte elemente dintr-un vector sunt divizibile cu un număr k.</li>
+                    <li>Afișează toate valorile divizibile cu 7 dintr-un vector.</li>
+                    <li>Suma elementelor pare (adică divizibile cu 2).</li>
+                </ul>
+                <b>Cod exemplu:</b>
+<pre>
+int n, x;
+cin >> n;
+for (int i = 1; i &lt;= n; i++) {
+    cin >> x;
+    if (x % 2 == 0) cout << x << " este divizibil cu 2\n";
+}
+</pre>
+                <b>Probleme utile:</b>
+                <ul>
+                    <li>pbinfo.ro: Divizibile – numără elementele divizibile cu k într-un vector.</li>
+                </ul>
+            </p>
+            <div class="tip-card">
+                <strong>Tips:</strong> Folosește operatorul <code>%</code> pentru a verifica rapid divizibilitatea!
+            </div>
+            <h3>2. Divizibilitate în matrice</h3>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184130949517432/image.png?ex=6832bdc6&is=68316c46&hm=f90773d58673322cf34615044f9cbc616b57f891093b6732e90329cb2df0b377&" alt="Divizibilitate exemplu 2" class="zoomable">
+            <p>
+                <b>Exerciții frecvente:</b>
+                <ul>
+                    <li>Numără elementele divizibile cu k dintr-o matrice.</li>
+                    <li>Afișează elementele de pe diagonala principală divizibile cu 3.</li>
+                </ul>
+                <b>Cod exemplu:</b>
+<pre>
+int n, m, a[101][101], k, cnt = 0;
+cin >> n >> m >> k;
+for (int i = 1; i <= n; i++)
+    for (int j = 1; j <= m; j++) {
+        cin >> a[i][j];
+        if (a[i][j] % k == 0) cnt++;
+    }
+cout << cnt;
+</pre>
+                <b>Problemă utilă:</b>
+                <ul>
+                    <li>Afișează produsul elementelor divizibile cu 5 dintr-o matrice pătratică.</li>
+                </ul>
+            </p>
+            <h3>3. Divizibilitate în fișiere</h3>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184172288704613/image.png?ex=6832bdd0&is=68316c50&hm=72933d335b9a5992c4a5443d79efe870183d03ab383c74c857ef67b0aea840c8&" alt="Divizibilitate fișiere">
+            <p>
+                <b>Situație:</b> Ai un fișier <code>numere.txt</code> care conține o listă de numere.<br>
+                Vrei să numeri câte sunt divizibile cu 10.
+                <br>
+                <b>Cod exemplu:</b>
+<pre>
+#include &lt;fstream&gt;
+using namespace std;
+int x, cnt = 0;
+ifstream f("numere.txt");
+while (f >> x)
+    if (x % 10 == 0) cnt++;
+cout << cnt;
+</pre>
+                <b>Probleme similare:</b>
+                <ul>
+                    <li>Calculează suma numerelor din fișier divizibile cu 3.</li>
+                    <li>Scrie în alt fișier doar valorile divizibile cu 2 și 7.</li>
+                </ul>
+            </p>
+            <div class="tip-card">
+                <strong>Știai că?</strong> Poți folosi <code>ifstream</code> și <code>ofstream</code> pentru a lucra cu fișiere text în C++.
+            </div>
+            <h3>4. Alte idei de clasificare (avansat – clasa a 10-a)</h3>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184216538480710/image.png?ex=6832bdda&is=68316c5a&hm=9161b52c59d7b7d2e161dc8151a43b578568ff2da48d28bbb40c8704162144d7&" alt="Divizibilitate avansat">
+            <p>
+                <b>a) Divizibilitate și cifre:</b><br>
+                Un număr este divizibil cu 3 dacă suma cifrelor e divizibilă cu 3.<br>
+                Poți folosi funcții pentru a calcula suma cifrelor.
+                <br><br>
+                <b>b) Numere perfecte, multipli și divizori:</b><br>
+                Număr perfect: egal cu suma divizorilor săi proprii (ex: 6 = 1 + 2 + 3).<br>
+                Divizor: d este divizor al lui n dacă n % d == 0.
+                <br><br>
+                <b>c) Număr prim și relația cu divizibilitatea:</b><br>
+                Dacă un număr are doar 1 și el însuși ca divizori → este prim.
+            </p>
+            <div class="tip-card">
+                Exemplu avansat: <br>
+                Numărul 28 este perfect: 1 + 2 + 4 + 7 + 14 = 28.<br>
+                Numărul 17 este prim: are doar 1 și 17 ca divizori.
+            </div>
+            <h3>5. Probleme recapitulative</h3>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184265200926810/image.png?ex=6832bde6&is=68316c66&hm=922cf9693b26ead122c850ace0f375b094ff2d58a14452acb83006331cbb4661&" alt="Divizibilitate recapitulare">
+            <ul>
+                <li>Scrie un program care citește un vector și afișează:
+                    <ul>
+                        <li>Numărul de elemente divizibile cu 3</li>
+                        <li>Suma elementelor divizibile cu 4</li>
+                        <li>Media valorilor divizibile cu 2 și 5</li>
+                    </ul>
+                </li>
+                <li>Matrice pătratică: numără câte elemente sunt divizibile cu suma indicelui i + j.</li>
+                <li>Dintr-un fișier input.txt, citește numere și scrie într-un fișier output.txt doar cele divizibile cu 6.</li>
+            </ul>
+            <div class="tip-card">
+                Exemplu recapitulare: <br>
+                Vector: 6, 9, 12, 15, 18<br>
+                Numere divizibile cu 3: toate (5).<br>
+                Suma celor divizibile cu 4: 12.<br>
+                Media celor divizibile cu 2 și 5: 10 (dacă există).
+            </div>
+            <div class="tip-card">
+                <strong>Tips:</strong> Rezolvă cât mai multe probleme practice pentru a stăpâni divizibilitatea!
+            </div>
+            <h3>6. Recapitulare și concluzii</h3>
+            <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375184349393195080/image.png?ex=6832bdfa&is=68316c7a&hm=2a85ee116611e115eb4e23fe81770880db68718f1867715be897141d645b5836&" alt="Divizibilitate concluzii">
+            <p>
+                Divizibilitatea este o proprietate fundamentală în programare.<br>
+                Se aplică ușor în vectori, matrice, fișiere și chiar în algoritmi mai complicați.<br>
+                Problemele cu divizibilitate pot implica parcurgere, condiționare și prelucrarea cifrelor.
+            </p>
+            <div class="tip-card">
+                Concluzie: <br>
+                Divizibilitatea se aplică ușor în vectori, matrice, fișiere și algoritmi.<br>
+                Exersează pe cât mai multe probleme practice!
+            </div>
+        </section>
+        <section class="theory-content">
+            <h3>Tablouri Unidimensionale (Vectori)</h3>
+            <p>
+                Sunt tipuri de date definite de către utilizator în care elementele sunt de același tip.
+            </p>
+            <p>
+                <strong>Declararea unui vector:</strong><br>
+                <code>tip_returnat nume_vector[dimensiune_maxima];</code><br>
+                Exemplu: <code>int a[100];</code><br>
+                <span style="color: red;">Atenție!</span> <code>a[n]</code> este greșit.
+            </p>
+            <p>
+                <strong>Citirea unui vector:</strong>
+            </p>
+<pre>
+cin >> n; // n - numărul de elemente
+for (i = 1; i &lt;= n; i++) {
+    cout << "a[" << i << "]=";
+    cin >> a[i];
+}
+</pre>
+            <p>
+                <strong>Afișarea elementelor unui vector:</strong>
+            </p>
+<pre>
+for (i = 1; i &lt;= n; i++) {
+    cout << a[i] << " ";
+}
+</pre>
+        </section>
+        <section class="theory-content">
+            <h3>Fișiere în C++</h3>
+            <p>
+                <strong>Biblioteca referitoare la fișiere</strong><br>
+                În C++, pentru a lucra cu fișiere, trebuie să includem următoarea bibliotecă:<br>
+                <code>#include &lt;fstream&gt;</code>
+            </p>
+            <p>
+                <strong>🔸 Tipuri de Fișiere</strong><br>
+                Există două tipuri principale de fișiere:
+                <ul>
+                    <li><b>Fișiere de intrare (citire):</b> folosim <code>ifstream</code></li>
+                    <li><b>Fișiere de ieșire (scriere):</b> folosim <code>ofstream</code></li>
+                </ul>
+            </p>
+            <p>
+                <strong>🧩 Conexiune program &lt;-&gt; fișier</strong><br>
+                Pentru a face conexiunea între program și fișierul interior/exterior, este necesar să declarăm o variabilă de tipul fișierului corespunzător fișierului utilizat.
+            </p>
+            <p>
+                <strong>📥 Declarația fișierelor de intrare:</strong><br>
+                Se face cu <code>ifstream</code>:
+                <br>
+                <code>ifstream nume_variabilă("nume_fișier");</code>
+            </p>
+            <p>
+                <strong>📌 Exemple:</strong>
+                <ul>
+                    <li><code>ifstream f("data.in");</code></li>
+                    <li><code>ifstream f("data_test");</code></li>
+                    <li><code>ifstream f("file.txt");</code></li>
+                </ul>
+            </p>
+            <p>
+                <strong>🔒 Închiderea fișierelor</strong><br>
+                Este esențial să închidem întotdeauna un fișier la sfârșitul unei sarcini:<br>
+                <code>ofstream g("date.out");</code>
+            </p>
+            <p>
+                <strong>Testarea finalului de fișier</strong><br>
+                Funcția care testează finalul de fișier: <code>while (!eof)</code> – testează dacă am ajuns la finalul fișierului.
+            </p>
+        </section>
+        <section class="theory-content">
+            <h3>🔢 Tablouri bidimensionale (matrice)</h3>
+            <p>
+                <strong>🔷 Definiție</strong><br>
+                Tablourile bidimensionale sunt structuri de date formate din elemente de același tip, dispuse în două dimensiuni: linii și coloane.<br>
+                Fiecare element se identifică printr-un dublu indice: primul pentru linie, al doilea pentru coloană.
+            </p>
+            <p>
+                <strong>🧱 Declararea unui tablou bidimensional</strong><br>
+                <b>Sintaxa:</b>
+            </p>
+<pre>
+tip nume[NR_LINII][NR_COLOANE];
+</pre>
+            <p>
+                <strong>📌 Exemplu:</strong>
+            </p>
+<pre>
+int a[5][5]; // matrice de 5 linii și 5 coloane
+</pre>
+            <p>
+                <strong>📥 Inițializarea unei matrice</strong><br>
+                Matricea poate fi inițializată direct la declarare:
+            </p>
+<pre>
+int a[2][3] = {
+    {1, 2, 3},
+    {4, 5, 6}
+};
+</pre>
+            <p>
+                <strong>🔁 Parcurgerea elementelor</strong><br>
+                Pentru a accesa fiecare element, folosim două bucle imbricate:
+            </p>
+<pre>
+for (int i = 0; i &lt; nr_linii; i++) {
+    for (int j = 0; j &lt; nr_coloane; j++) {
+        // accesăm a[i][j]
+    }
+}
+</pre>
+            <p>
+                <strong>🧭 Observații:</strong><br>
+                - Indicii încep de la 0 (dacă nu se specifică altfel).<br>
+                - Tablourile pot fi pătratice (nr. linii = nr. coloane) sau dreptunghiulare.
+            </p>
+            <p>
+                <strong>📌 Exemplu complet:</strong>
+            </p>
+<pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int m[3][3];
+
+    // Citirea elementelor
+    for (int i = 0; i &lt; 3; i++) {
+        for (int j = 0; j &lt; 3; j++) {
+            cin >> m[i][j];
+        }
+    }
+
+    // Afișarea elementelor
+    for (int i = 0; i &lt; 3; i++) {
+        for (int j = 0; j &lt; 3; j++) {
+            cout << m[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
+</pre>
+        </section>
+        <div style="margin:48px 0 0 0; text-align:center;">
+          <a href="faq.html" title="FAQ Informatică Bacalaureat" style="font-size:1.25em; text-decoration:none; color:#38598b; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+            <span style="font-size:1.5em;">🔍</span> FAQ Informatică Bacalaureat
+          </a>
+        </div>
+    </main>
+    <!-- Buton dark mode -->
+    <button id="dark-toggle" class="dark-toggle-btn" title="Schimbă tema">🌙</button>
+    <script>
+    // Copiere cod
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.theory-content pre').forEach(function(pre) {
+            const btn = document.createElement('button');
+            btn.textContent = 'Copiază';
+            btn.className = 'copy-btn';
+            btn.onclick = function() {
+                navigator.clipboard.writeText(pre.innerText);
+                btn.textContent = 'Copiat!';
+                setTimeout(() => btn.textContent = 'Copiază', 1200);
+            };
+            pre.appendChild(btn);
+        });
+
+        // Dark mode cu iconiță dinamică
+        const toggleBtn = document.getElementById('dark-toggle');
+        function updateIcon() {
+            toggleBtn.textContent = document.body.classList.contains('dark-mode') ? '🌞' : '🌙';
+        }
+        toggleBtn.onclick = function() {
+            document.body.classList.toggle('dark-mode');
+            updateIcon();
+        };
+        updateIcon();
+    });
+
+    // Active nav underline fix
+    (function() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+      if (path.endsWith('theory.html')) {
+        document.getElementById('nav-theory').classList.add('active');
+      } else if (path.endsWith('problemerezolvate.html')) {
+        document.getElementById('nav-probleme').classList.add('active');
+      } else if (path.endsWith('test.html')) {
+        document.getElementById('nav-test').classList.add('active');
+      }
+    })();
+
+    // Zoom image on click, close on outside click
+    (function() {
+      function createModal(imgSrc) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.background = 'rgba(0,0,0,0.8)';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.zIndex = 9999;
+        modal.style.cursor = 'zoom-out';
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.style.maxWidth = '90vw';
+        img.style.maxHeight = '90vh';
+        img.style.borderRadius = '12px';
+        img.style.boxShadow = '0 2px 16px rgba(0,0,0,0.25)';
+        img.style.background = '#fff';
+        img.alt = '';
+        modal.appendChild(img);
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+        document.body.appendChild(modal);
+      }
+      document.querySelectorAll('.theory-content img').forEach(function(img) {
+        img.classList.add('zoomable');
+        img.addEventListener('click', function() {
+          createModal(img.src);
+        });
+      });
+    })();
+    </script>
+</body>
+</html>

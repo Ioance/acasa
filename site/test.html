@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mutăm toate întrebările într-un array și le amestecăm la fiecare încărcare
+            const quizForm = document.getElementById('quiz-form');
+            const questionNodes = Array.from(quizForm.querySelectorAll('.question.choice'));
+            // Salvăm referința la butoanele și scorul
+            const submitBtn = document.getElementById('submit-btn');
+            const retryBtn = document.getElementById('retry-btn');
+            const scoreBox = document.getElementById('score-box');
+            const correctSound = new Audio('../sounds/correct.mp3');
+            const wrongSound = new Audio('../sounds/wrong.mp3');
+            const perfectSound = new Audio('../sounds/perfect.mp3');
+
+            // Funcție de amestecare Fisher-Yates
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // Amestecăm întrebările și le reatașăm în formular
+            function randomizeQuestions() {
+                shuffle(questionNodes);
+                questionNodes.forEach(q => quizForm.appendChild(q));
+            }
+            randomizeQuestions();
+
+            // Disable submit initially
+            submitBtn.disabled = true;
+
+            // Helper: check if all questions have an answer
+            function allAnswered() {
+                return Array.from(quizForm.querySelectorAll('.question.choice')).every(q => q.querySelector('.choice-btn.selected'));
+            }
+
+            // Helper: clear all answers
+            function clearAll() {
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(q => {
+                    q.querySelectorAll('.choice-btn').forEach(btn => {
+                        btn.classList.remove('selected', 'correct', 'wrong');
+                        btn.disabled = false;
+                    });
+                    q.querySelector('.feedback').style.display = 'none';
+                });
+                scoreBox.style.display = 'none';
+                submitBtn.disabled = true;
+            }
+
+            // Choice buttons feedback
+            function setupChoices() {
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(function (q) {
+                    const btns = Array.from(q.querySelectorAll('.choice-btn'));
+                    btns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            // Don't allow changing answer after submit
+                            if (submitBtn.disabled === false) return;
+                            btns.forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            // Enable submit if all answered
+                            if (allAnswered()) submitBtn.disabled = false;
+                        });
+                    });
+                });
+            }
+            setupChoices();
+
+            submitBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                let score = 0;
+                let total = 0;
+
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(function (q) {
+                    const btns = Array.from(q.querySelectorAll('.choice-btn'));
+                    const correct = q.dataset.correct;
+                    const feedback = q.querySelector('.feedback');
+                    const selected = btns.find(btn => btn.classList.contains('selected'));
+                    btns.forEach(btn => btn.disabled = true);
+                    if (selected && selected.textContent.trim().startsWith(correct)) {
+                        selected.classList.add('correct');
+                        feedback.innerHTML = '<span style="color:green;font-weight:bold;">&#10003; Răspuns Corect!</span>';
+                        feedback.style.display = 'block';
+                        correctSound.play();
+                        score++;
+                    } else {
+                        if (selected) selected.classList.add('wrong');
+                        feedback.innerHTML = '<span style="color:red;font-weight:bold;">&#10007; Răspuns Greșit</span>';
+                        feedback.style.display = 'block';
+                        wrongSound.play();
+                    }
+                    total++;
+                });
+
+                if (score === total) {
+                    perfectSound.play();
+                }
+
+                scoreBox.innerHTML = `<span style="color:green;font-size:1.2em;font-weight:bold;">Scor final: ${score} / ${total}</span>`;
+                scoreBox.style.display = 'block';
+                submitBtn.style.display = 'none';
+                retryBtn.style.display = 'inline-block';
+            });
+
+            retryBtn.addEventListener('click', function () {
+                clearAll();
+                submitBtn.style.display = 'inline-block';
+                retryBtn.style.display = 'none';
+                // Reamestecă întrebările la retry
+                randomizeQuestions();
+                setupChoices();
+            });
+
+        });
+    </script>
+    <style>
+        body {
+            background: #f7f7f7;
+        }
+        .test-content {
+            max-width: 900px;
+            margin: 40px auto 0 auto;
+            padding: 48px 36px 48px 36px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        .question {
+            margin-bottom: 64px;
+            font-size: 1.25em;
+        }
+        .feedback {
+            margin-top: 12px;
+            font-size: 1.15em;
+            display: none;
+        }
+        #score-box {
+            margin-top: 40px;
+            text-align: center;
+            display: none;
+        }
+        .test-content label {
+            font-weight: bold;
+            font-size: 1.18em;
+        }
+        /* Imaginea sub întrebare */
+        .question-img {
+            display: block;
+            margin: 28px auto 18px auto;
+            max-width: 100%;
+            width: 650px;
+            min-width: 320px;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+        }
+        /* O singură coloană pentru răspunsuri, dar mai mari */
+        .choices-col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            align-items: stretch;
+        }
+        .choice-btn {
+            display: block;
+            min-width: 320px;
+            max-width: 100%;
+            width: 100%;
+            height: 56px;
+            padding: 0 18px;
+            border-radius: 12px;
+            border: 2px solid #ccc;
+            background: #f7f7f7;
+            font-size: 1.18em;
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+            text-align: left;
+            white-space: pre-line;
+            font-weight: 500;
+        }
+        .choice-btn.selected {
+            border: 2.5px solid #35424a;
+            background: #e6e6e6;
+        }
+        .choice-btn.correct.selected {
+            border: 2.5px solid #2ecc40;
+            background: #eafbe7;
+        }
+        .choice-btn.wrong.selected {
+            border: 2.5px solid #e8491d;
+            background: #fdeaea;
+        }
+        @media (max-width: 900px) {
+            .test-content {
+                max-width: 99vw;
+                padding: 4vw 2vw;
+            }
+            .question-img {
+                width: 99vw;
+                max-width: 99vw;
+            }
+            .choice-btn {
+                min-width: 0;
+                font-size: 1em;
+            }
+        }
+        #retry-btn {
+            display: none;
+            font-size:1.15em;
+            padding:10px 32px;
+            margin-left: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="index.html" title="Înapoi la meniul principal">
+                <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375545958569480333/d135f00b-be77-4a82-b7bb-27f5e79c1489.jpg?ex=68321480&is=6830c300&hm=cf196dd41016349c0a8d90dc4d9a177b5ff588a62ecdb84b915325c38ee385f8&" alt="Logo" height="120" style="cursor:pointer; border:none;">
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="theory.html" id="nav-theory">Teorie</a></li>
+                <li><a href="problemerezolvate.html" id="nav-probleme">Probleme Rezolvate</a></li>
+                <li><a href="test.html" id="nav-test">Test</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="test-content">
+            <h2 style="font-size:2em;">Test: Divizibilitatea și Probleme Rezolvate</h2>
+            <form id="quiz-form">
+                <!-- 1 -->
+                <div class="question choice" data-correct="B.">
+                    <label>Analiză de cod<br>
+                    Ce face următorul program?</label>
+                    <pre style="background:#f7f7f7;padding:10px;border-radius:8px;"></pre>
+                    <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375207772538409080/image.png?ex=6830d98b&is=682f880b&hm=03e4128a86b31f15c4c103856719149fa66e5ea1c46df2dcecbce54e74e612fe&" alt="Analiză de cod" class="question-img zoomable">
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. Afișează "Divizibil"</button>
+                        <button type="button" class="choice-btn">B. Afișează 9</button>
+                        <button type="button" class="choice-btn">C. Afișează 12</button>
+                        <button type="button" class="choice-btn">D. Eroare de compilare</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 2 -->
+                <div class="question choice" data-correct="B.">
+                    <label> Vectori și divizibilitate<br>
+                    Se citește un vector de n elemente. Se cere numărul valorilor care sunt divizibile cu 2, dar nu cu 4.<br>
+                    Care condiție este corectă?</label>
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. if (v[i] % 2 == 0 || v[i] % 4 != 0)</button>
+                        <button type="button" class="choice-btn">B. if (v[i] % 2 == 0 && v[i] % 4 != 0)</button>
+                        <button type="button" class="choice-btn">C. if (v[i] % 2 != 0 && v[i] % 4 == 0)</button>
+                        <button type="button" class="choice-btn">D. if (v[i] % 2 == 0 && v[i] % 4 == 0)</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 3 -->
+                <div class="question choice" data-correct="B.">
+                    <label> Matrici<br>
+                    Ai o matrice pătratică a[n][n]. Vrei să afișezi numerele de pe diagonala secundară care sunt divizibile cu 5.<br>
+                    Ce condiție corectă vei folosi?</label>
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. if (i == j && a[i][j] % 5 == 0)</button>
+                        <button type="button" class="choice-btn">B. if (i + j == n - 1 && a[i][j] % 5 == 0)</button>
+                        <button type="button" class="choice-btn">C. if (a[i][j] == 5)</button>
+                        <button type="button" class="choice-btn">D. if (a[i][i] % 5 == 0)</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 4 -->
+                <div class="question choice" data-correct="C.">
+                    <label> Fișiere și divizibilitate<br>
+                    Fișierul numere.txt conține 100 de valori. Ce face codul?</label>
+                    <pre style="background:#f7f7f7;padding:10px;border-radius:8px;"></pre>
+                    <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375207712920440893/image.png?ex=6830d97c&is=682f87fc&hm=5b08d324315acb95609994bae0dfa2cbc1d14ab665448c787dd98dda9d701dd5&" alt="Fișiere și divizibilitate" class="question-img zoomable">
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. Numără valorile divizibile cu 2</button>
+                        <button type="button" class="choice-btn">B. Numără valorile divizibile cu 2, 3 sau 5</button>
+                        <button type="button" class="choice-btn">C. Numără valorile divizibile simultan cu 2, 3 și 5</button>
+                        <button type="button" class="choice-btn">D. Numără valorile impare</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 5 -->
+                <div class="question choice" data-correct="C.">
+                    <label> Gândire logică<br>
+                    Un număr este divizibil cu 6 doar dacă:</label>
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. Este divizibil cu 3</button>
+                        <button type="button" class="choice-btn">B. Este divizibil cu 2</button>
+                        <button type="button" class="choice-btn">C. Este par și divizibil cu 3</button>
+                        <button type="button" class="choice-btn">D. Are suma cifrelor mai mare ca 6</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 6 -->
+                <div class="question choice" data-correct="B.">
+                    <label> Cod cu funcții<br>
+                    Ce face această funcție?</label>
+                    <pre style="background:#f7f7f7;padding:10px;border-radius:8px;"></pre>
+                    <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375207820001148958/image.png?ex=6830d996&is=682f8816&hm=8a12779e3489dfbe3048a44a5fabb45457e0b9b7e7811048d3c0fb694dd24a5c&" alt="Cod cu funcții" class="question-img zoomable">
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. Verifică dacă x este multiplu de 9</button>
+                        <button type="button" class="choice-btn">B. Verifică dacă x este divizibil cu cel puțin un număr între 2 și 9</button>
+                        <button type="button" class="choice-btn">C. Afișează toți divizorii lui x</button>
+                        <button type="button" class="choice-btn">D. Returnează true doar dacă x e prim</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 7 -->
+                <div class="question choice" data-correct="A.">
+                    <label> Suma cifrelor și divizibilitate<br>
+                    Ce se afișează?</label>
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. Div3</button>
+                        <button type="button" class="choice-btn">B. Nu</button>
+                        <button type="button" class="choice-btn">C. 6</button>
+                        <button type="button" class="choice-btn">D. 123</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+                <!-- 8 -->
+                <div class="question choice" data-correct="B.">
+                    <label> Modulo în C++<br>
+                    Care este rezultatul expresiei -8 % 3 în C++?</label>
+                    <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375207858144018442/image.png?ex=6830d99f&is=682f881f&hm=9f804575d9c54c46a8f1a49325e1e8ac838494ec609f51ffda30172538c0c6e7&" alt="Modulo în C++" class="question-img zoomable">
+                    <div class="choices-col">
+                        <button type="button" class="choice-btn">A. 2</button>
+                        <button type="button" class="choice-btn">B. -2</button>
+                        <button type="button" class="choice-btn">C. 3</button>
+                        <button type="button" class="choice-btn">D. 0</button>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+            </form>
+        </section>
+    </main>
+    <div class="test-actions">
+        <button id="submit-btn" type="button" style="font-size:1.18em;padding:12px 36px;">Trimite testul</button>
+        <button id="retry-btn" type="button">Încearcă din nou</button>
+        <div id="score-box"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mutăm toate întrebările într-un array și le amestecăm la fiecare încărcare
+            const quizForm = document.getElementById('quiz-form');
+            const questionNodes = Array.from(quizForm.querySelectorAll('.question.choice'));
+            // Salvăm referința la butoanele și scorul
+            const submitBtn = document.getElementById('submit-btn');
+            const retryBtn = document.getElementById('retry-btn');
+            const scoreBox = document.getElementById('score-box');
+            const correctSound = new Audio('../sounds/correct.mp3');
+            const wrongSound = new Audio('../sounds/wrong.mp3');
+            const perfectSound = new Audio('../sounds/perfect.mp3');
+
+            // Funcție de amestecare Fisher-Yates
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // Amestecăm întrebările și le reatașăm în formular
+            function randomizeQuestions() {
+                shuffle(questionNodes);
+                questionNodes.forEach(q => quizForm.appendChild(q));
+            }
+            randomizeQuestions();
+
+            // Disable submit initially
+            submitBtn.disabled = true;
+
+            // Helper: check if all questions have an answer
+            function allAnswered() {
+                return Array.from(quizForm.querySelectorAll('.question.choice')).every(q => q.querySelector('.choice-btn.selected'));
+            }
+
+            // Helper: clear all answers
+            function clearAll() {
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(q => {
+                    q.querySelectorAll('.choice-btn').forEach(btn => {
+                        btn.classList.remove('selected', 'correct', 'wrong');
+                        btn.disabled = false;
+                    });
+                    q.querySelector('.feedback').style.display = 'none';
+                });
+                scoreBox.style.display = 'none';
+                submitBtn.disabled = true;
+            }
+
+            // Choice buttons feedback
+            function setupChoices() {
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(function (q) {
+                    const btns = Array.from(q.querySelectorAll('.choice-btn'));
+                    btns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            // Don't allow changing answer after submit
+                            if (submitBtn.disabled === false) return;
+                            btns.forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            // Enable submit if all answered
+                            if (allAnswered()) submitBtn.disabled = false;
+                        });
+                    });
+                });
+            }
+            setupChoices();
+
+            submitBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                let score = 0;
+                let total = 0;
+
+                Array.from(quizForm.querySelectorAll('.question.choice')).forEach(function (q) {
+                    const btns = Array.from(q.querySelectorAll('.choice-btn'));
+                    const correct = q.dataset.correct;
+                    const feedback = q.querySelector('.feedback');
+                    const selected = btns.find(btn => btn.classList.contains('selected'));
+                    btns.forEach(btn => btn.disabled = true);
+                    if (selected && selected.textContent.trim().startsWith(correct)) {
+                        selected.classList.add('correct');
+                        feedback.innerHTML = '<span style="color:green;font-weight:bold;">&#10003; Răspuns Corect!</span>';
+                        feedback.style.display = 'block';
+                        correctSound.play();
+                        score++;
+                    } else {
+                        if (selected) selected.classList.add('wrong');
+                        feedback.innerHTML = '<span style="color:red;font-weight:bold;">&#10007; Răspuns Greșit</span>';
+                        feedback.style.display = 'block';
+                        wrongSound.play();
+                    }
+                    total++;
+                });
+
+                if (score === total) {
+                    perfectSound.play();
+                }
+
+                scoreBox.innerHTML = `<span style="color:green;font-size:1.2em;font-weight:bold;">Scor final: ${score} / ${total}</span>`;
+                scoreBox.style.display = 'block';
+                submitBtn.style.display = 'none';
+                retryBtn.style.display = 'inline-block';
+            });
+
+            retryBtn.addEventListener('click', function () {
+                clearAll();
+                submitBtn.style.display = 'inline-block';
+                retryBtn.style.display = 'none';
+                // Reamestecă întrebările la retry
+                randomizeQuestions();
+                setupChoices();
+            });
+
+        });
+    </script>
+    <script>
+        // Active nav underline fix
+        (function() {
+          const path = window.location.pathname;
+          document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+          if (path.endsWith('theory.html')) {
+            document.getElementById('nav-theory').classList.add('active');
+          } else if (path.endsWith('problemerezolvate.html')) {
+            document.getElementById('nav-probleme').classList.add('active');
+          } else if (path.endsWith('test.html')) {
+            document.getElementById('nav-test').classList.add('active');
+          }
+        })();
+    </script>
+    <!-- Zoom image on click, close on outside click -->
+    <script>
+      (function() {
+        function createModal(imgSrc) {
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.top = 0;
+          modal.style.left = 0;
+          modal.style.width = '100vw';
+          modal.style.height = '100vh';
+          modal.style.background = 'rgba(0,0,0,0.8)';
+          modal.style.display = 'flex';
+          modal.style.alignItems = 'center';
+          modal.style.justifyContent = 'center';
+          modal.style.zIndex = 9999;
+          modal.style.cursor = 'zoom-out';
+          const img = document.createElement('img');
+          img.src = imgSrc;
+          img.style.maxWidth = '90vw';
+          img.style.maxHeight = '90vh';
+          img.style.borderRadius = '12px';
+          img.style.boxShadow = '0 2px 16px rgba(0,0,0,0.25)';
+          img.style.background = '#fff';
+          img.alt = '';
+          modal.appendChild(img);
+          modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+              document.body.removeChild(modal);
+            }
+          });
+          document.body.appendChild(modal);
+        }
+        document.querySelectorAll('.zoomable').forEach(function(img) {
+          img.style.cursor = 'zoom-in';
+          img.addEventListener('click', function() {
+            createModal(img.src);
+          });
+        });
+      })();
+    </script>
+</body>
+</html>

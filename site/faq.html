@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ Informatică Bacalaureat</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f7f9fb; font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 0; }
+        .faq-content {
+            max-width: 850px;
+            margin: 48px auto 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
+            padding: 36px 28px 40px 28px;
+            font-size: 1.08em;
+            line-height: 1.7;
+        }
+        .faq-content h1 {
+            color: #2d4059;
+            font-size: 2.1em;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .faq-content h2 {
+            color: #38598b;
+            margin-top: 36px;
+            font-size: 1.3em;
+        }
+        .faq-content ul, .faq-content ol {
+            margin-left: 28px;
+            margin-bottom: 16px;
+        }
+        .faq-content pre {
+            background: #f3f6fa;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 0.97em;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            color: #1a3a5c;
+            margin-bottom: 22px;
+            overflow-x: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            word-break: break-word;
+            box-shadow: 0 4px 18px rgba(44, 62, 80, 0.10), 0 1.5px 4px rgba(44,62,80,0.07);
+            border: 1px solid #e3e8ee;
+        }
+        .faq-content strong { color: #2d4059; }
+        .faq-content .q { color: #e4572e; font-weight: 700; }
+        .faq-content .a { color: #38598b; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="index.html" title="Înapoi la meniul principal">
+                <img src="https://cdn.discordapp.com/attachments/1244332449874579600/1375545958569480333/d135f00b-be77-4a82-b7bb-27f5e79c1489.jpg?ex=68321480&is=6830c300&hm=cf196dd41016349c0a8d90dc4d9a177b5ff588a62ecdb84b915325c38ee385f8&" alt="Logo" height="120" style="cursor:pointer; border:none;">
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="theory.html" id="nav-theory">Teorie</a></li>
+                <li><a href="problemerezolvate.html" id="nav-probleme">Probleme Rezolvate</a></li>
+                <li><a href="test.html" id="nav-test">Test</a></li>
+                <li><a href="faq.html" id="nav-faq">FAQ</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="faq-content">
+        <h1><span>🔍</span> FAQ Informatică - Bacalaureat</h1>
+        <h2>1. Bazele programării</h2>
+        <div class="q">Q: Care sunt diferențele dintre compilatoare și interpretoare?</div>
+        <div class="a">
+            <ul>
+                <li><strong>Compilatoarele</strong> (ex: GCC pentru C++) transformă tot codul sursă în mașinărie odată (executabil)</li>
+                <li><strong>Interpretoarele</strong> (ex: Python) execută linie cu linie, fără a crea fișier executabil</li>
+                <li>Avantaje compilare: viteză de execuție mai mare</li>
+                <li>Avantaje interpretare: portabilitate, depanare mai ușoară</li>
+            </ul>
+        </div>
+        <div class="q">Q: Ce tipuri de date fundamentale cunoașteți în C++?</div>
+        <div class="a">
+            <ul>
+                <li><strong>int</strong> - numere întregi (ex: -5, 0, 127)</li>
+                <li><strong>float/double</strong> - numere reale (ex: 3.14)</li>
+                <li><strong>char</strong> - un singur caracter (ex: 'A')</li>
+                <li><strong>bool</strong> - valori logice (true/false)</li>
+                <li><strong>void</strong> - tip special fără valori</li>
+            </ul>
+        </div>
+        <h2>2. Structuri de date</h2>
+        <div class="q">Q: Când alegem vectori și când liste înlănțuite?</div>
+        <div class="a">
+            <strong>Vectori când:</strong>
+            <ul>
+                <li>Avem nevoie de acces rapid la elemente (O(1))</li>
+                <li>Dimensiunea este cunoscută sau relativ constantă</li>
+            </ul>
+            <strong>Liste când:</strong>
+            <ul>
+                <li>Facem inserări/ștergeri frecvente (O(1))</li>
+                <li>Dimensiunea variază mult</li>
+            </ul>
+        </div>
+        <div class="q">Q: Ce este un arbore binar și unde se folosește?</div>
+        <div class="a">
+            Structură ierarhică unde fiecare nod are maximum 2 copii. Aplicații:
+            <ul>
+                <li>Arbori de căutare binară (BST)</li>
+                <li>Heap-uri (sortare și priorități)</li>
+                <li>Parșare expresii matematice</li>
+            </ul>
+        </div>
+        <h2>3. Algoritmi fundamentali</h2>
+        <div class="q">Q: Cum funcționează quicksort și care e complexitatea lui?</div>
+        <div class="a">
+            <ul>
+                <li>Alege un element pivot</li>
+                <li>Partitionează vectorul în elemente &lt; pivot și &gt; pivot</li>
+                <li>Aplică recursiv pe subvectori</li>
+            </ul>
+            <strong>Complexitate:</strong>
+            <ul>
+                <li>Best case: O(n log n)</li>
+                <li>Worst case: O(n²) (dacă pivotul e mereu minim/maxim)</li>
+                <li>Average case: O(n log n)</li>
+            </ul>
+        </div>
+        <div class="q">Q: Ce este programarea dinamică și când o folosim?</div>
+        <div class="a">
+            Tehnică care rezolvă problemele prin:
+            <ul>
+                <li>Descompunere în subprobleme</li>
+                <li>Memorarea soluțiilor subproblemelor</li>
+                <li>Combinarea soluțiilor</li>
+            </ul>
+            <strong>Exemple clasice:</strong>
+            <ul>
+                <li>Problema rucsacului</li>
+                <li>Șirul Fibonacci</li>
+                <li>Cel mai lung subșir comun</li>
+            </ul>
+        </div>
+        <h2>4. Operarea cu fișiere</h2>
+        <div class="q">Q: Cum citesc/scriu eficient în fișiere în C++?</div>
+        <div class="a">
+            <pre><code>#include &lt;fstream&gt;
+using namespace std;
+
+// Scriere
+ofstream fout("fisier.out");
+fout &lt;&lt; "Text de scris" &lt;&lt; endl;
+fout.close();
+
+// Citire
+ifstream fin("fisier.in");
+string linie;
+while(getline(fin, linie)) {
+    cout &lt;&lt; linie &lt;&lt; endl;
+}
+fin.close();
+</code></pre>
+            <strong>Optimizări:</strong>
+            <ul>
+                <li>Folosește <code>#define cin fin</code> pentru a redirecționa inputul</li>
+                <li>Pentru performanță, citește tot conținutul deodată în buffer</li>
+            </ul>
+        </div>
+        <h2>5. Întrebări capcana</h2>
+        <div class="q">Q: De ce 0.1 + 0.2 != 0.3 în majoritatea limbajelor?</div>
+        <div class="a">Din cauza reprezentării în virgulă flotantă (binary floating-point), unde unele fracții zecimale nu pot fi reprezentate exact, ducând la erori de rotunjire.</div>
+        <div class="q">Q: Ce face i+++i++ și de ce e periculos?</div>
+        <div class="a">Comportamentul este nedefinit în C++. Depinde de compilator și poate produce rezultate diferite. Evitați expresii cu multiple modificări ale aceleiași variabile într-o singură instrucțiune.</div>
+        <h2>6. Sfaturi pentru examen</h2>
+        <div class="q">Q: Cum îmi gestionez timpul în examen?</div>
+        <div class="a">
+            <ul>
+                <li>Alocă: 20% timp pentru citirea și înțelegerea problemelor</li>
+                <li>60% pentru implementare</li>
+                <li>20% pentru testare și corectare</li>
+                <li>Începe cu problemele pe care le consideri mai ușoare</li>
+                <li>Folosește comentarii pentru a marca unde ai rămas</li>
+            </ul>
+        </div>
+        <div class="q">Q: Cum verific corectitudinea algoritmilor mei?</div>
+        <div class="a">
+            <ul>
+                <li>Testează cu cazuri limită: vectori/siruri goale, elemente duplicate, valori minime/maxime</li>
+                <li>Implementează o soluție "naivă" pentru comparație</li>
+                <li>Verifică complexitatea timp cu un timer</li>
+            </ul>
+        </div>
+        <h2>7. Resurse recomandate</h2>
+        <div class="q">Q: Ce cărți/site-uri recomandați pentru pregătire?</div>
+        <div class="a">
+            <strong>Cărți:</strong>
+            <ul>
+                <li>"Introducere în algoritmi" (Cormen)</li>
+                <li>"Probleme de informatică vol. I-III" (Popovici)</li>
+            </ul>
+            <strong>Online:</strong>
+            <ul>
+                <li>Infoarena</li>
+                <li>Codeforces</li>
+                <li>Pbinfo</li>
+            </ul>
+        </div>
+    </main>
+    <script>
+        // Active nav underline fix
+        (function() {
+          const path = window.location.pathname;
+          document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+          if (path.endsWith('theory.html')) {
+            document.getElementById('nav-theory').classList.add('active');
+          } else if (path.endsWith('problemerezolvate.html')) {
+            document.getElementById('nav-probleme').classList.add('active');
+          } else if (path.endsWith('test.html')) {
+            document.getElementById('nav-test').classList.add('active');
+          } else if (path.endsWith('faq.html')) {
+            document.getElementById('nav-faq').classList.add('active');
+          }
+        })();
+    </script>
+</body>
+</html>

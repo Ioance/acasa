@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom 3D - Minecraft Style</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin:0; background:#cbe3f7; color:#222; font-family:'Inter',Arial,sans-serif; }
+    #game-canvas { width:100vw; height:100vh; display:block; background:#cbe3f7; }
+    #hud {
+      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.97); border-radius: 12px; padding: 18px 32px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10); z-index: 10; min-width: 320px;
+      text-align: center; font-size: 1.2em; display: none;
+    }
+    #hud button { margin-top: 18px; font-size: 1.1em; padding: 8px 24px; border-radius: 8px; border:none; background:#38598b; color:#fff; cursor:pointer; font-weight:600; }
+    #hud button:hover { background:#e4572e; }
+    #blackboard {
+      position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+      width: 420px; height: 120px; background: #23293a; color: #fff;
+      border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2em; font-family: 'Fira Mono', monospace; z-index: 20;
+      letter-spacing: 2px; text-align: center;
+      border: 4px solid #38598b;
+      display: none;
+    }
+    #game-over { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.98); padding:40px 60px; border-radius:18px; text-align:center; z-index:20; }
+    #game-over h2 { color:#e4572e; }
+    #game-over button { margin-top:18px; font-size:1.1em; padding:8px 24px; border-radius:8px; border:none; background:#38598b; color:#fff; cursor:pointer; font-weight:600; }
+    #game-over button:hover { background:#e4572e; }
+    #test-paper {
+      position: absolute; left: 50%; top: 60%; transform: translate(-50%,-50%);
+      background: rgba(255,255,255,0.98); border: 2px solid #bbb;
+      border-radius: 12px; padding: 32px 40px;
+      font-size: 1.15em; box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+      z-index: 50; display: none;
+    }
+    #test-paper b { color: #38598b; }
+    #test-paper button {
+      margin-top: 12px; font-size: 1.1em; padding: 8px 24px;
+      border-radius: 8px; background: #38598b; color: #fff;
+      border: none; cursor: pointer;
+    }
+    #test-paper button:hover { background: #e4572e; }
+    #funfact { display: none !important; }
+    #score { display: none !important; }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  <div id="hud">
+    <div id="question"></div>
+    <div id="answers"></div>
+  </div>
+  <div id="blackboard"></div>
+  <div id="score">Scor: <span id="score-value">0</span></div>
+  <div id="game-over">
+    <h2>Joc terminat!</h2>
+    <div id="final-score"></div>
+    <button onclick="location.reload()">Reîncearcă</button>
+  </div>
+  <div id="funfact"></div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+// Întrebări profesoară (inclusiv C++)
+const questions = [
+  {
+    q: "Ce face instrucțiunea 'continue' într-o buclă C++?",
+    a: ["Oprește complet bucla.", "Sare la următoarea iterație.", "Ignoră instrucțiunea următoare.", "Nu are efect."],
+    c: 1
+  },
+  {
+    q: "Ce tip de date returnează funcția main() în C++?",
+    a: ["void", "int", "char", "bool"],
+    c: 1
+  },
+  {
+    q: "Care este rezultatul expresiei 10/3 în C++ (int)?",
+    a: ["3.33", "3", "3.0", "4"],
+    c: 1
+  },
+  {
+    q: "Ce face operatorul '<<' în C++?",
+    a: ["Afișează date pe ecran.", "Citește date de la tastatură.", "Compară două valori.", "Nu există acest operator."],
+    c: 0
+  },
+  {
+    q: "Cum declari un vector de 100 de intregi în C++?",
+    a: ["int v[100];", "vector<int> v(100);", "int v = 100;", "array<int,100> v;"],
+    c: 0
+  },
+  {
+    q: "Ce instrucțiune citește o linie întreagă cu spații în C++?",
+    a: ["cin", "getline", "scanf", "readline"],
+    c: 1
+  },
+  {
+    q: "Ce înseamnă O(n^2)?",
+    a: ["Complexitate liniară.", "Complexitate exponențială.", "Complexitate pătratică.", "Complexitate constantă."],
+    c: 2
+  },
+  {
+    q: "Ce tip de date folosești pentru valori adevărat/fals?",
+    a: ["int", "bool", "char", "float"],
+    c: 1
+  }
+];
+const funfacts = [
+  "Știai că în C++ poți folosi // pentru comentarii pe o linie?",
+  "Glumă: De ce nu merge programul? Pentru că nu are cafea!",
+  "Fun fact: std::vector se redimensionează automat când adaugi elemente.",
+  "Glumă: Un pointer intră într-un bar... și se dereferă!",
+  "Știai că poți folosi 'auto' pentru a deduce tipul unei variabile în C++?",
+  "Glumă: C++ nu are bug-uri, doar funcții nedocumentate!"
+];
+const classmatesData = [
+  { name: 'Alex', color: 0x7b9acc, face: 0xfbeee6, hair: 0x222222, hairStyle: 'short', accessory: 'none' }, // negru
+  { name: 'Mara', color: 0x8fd694, face: 0xfbeee6, hair: 0xd2b48c, hairStyle: 'long', accessory: 'bow' }, // saten
+  { name: 'Vlad', color: 0xf7b267, face: 0xfbeee6, hair: 0x8b5a2b, hairStyle: 'short', accessory: 'glasses' }, // maro
+  { name: 'Daria', color: 0xe4572e, face: 0xfbeee6, hair: 0xf9e076, hairStyle: 'bob', accessory: 'none' }, // blond
+  { name: 'Radu', color: 0x38598b, face: 0xfbeee6, hair: 0x8b0000, hairStyle: 'short', accessory: 'none' }, // roscat
+  { name: 'Andreea', color: 0x6a4c93, face: 0xfbeee6, hair: 0x8b5a2b, hairStyle: 'long', accessory: 'glasses' }, // maro
+  { name: 'Paul', color: 0x2d4059, face: 0xfbeee6, hair: 0xd2b48c, hairStyle: 'short', accessory: 'none' }, // saten
+  { name: 'Bianca', color: 0x43aa8b, face: 0xfbeee6, hair: 0xf9e076, hairStyle: 'bob', accessory: 'bow' }, // blond
+  { name: 'Ionut', color: 0xf9c846, face: 0xfbeee6, hair: 0x222222, hairStyle: 'short', accessory: 'none' }, // negru
+  { name: 'Elena', color: 0x3a86ff, face: 0xfbeee6, hair: 0x8b0000, hairStyle: 'long', accessory: 'none' } // roscat
+];
+const classmatesSmallTalk = [
+  "Ai un pix?",
+  "Cât e ceasu'?",
+  "Ce oră avem după?",
+  "Ai tema la mate?",
+  "Mergem la magazin în pauză?",
+  "Ai văzut serialul aseară?",
+  "Ce ai luat la test?",
+  "Vii la fotbal după?"
+];
+let scene, camera, renderer, player, teacher, classmates = [], nameLabels = [], clock, score = 0, questionIdx = 0, answered = false, gameOver = false, askingQuestion = false;
+let testPaperVisible = false;
+const canvas = document.getElementById('game-canvas');
+let playerPos = { x: 0, z: 6 - 2*3.2 }; // Poziția băncii jucătorului
+let playerTarget = { x: 0, z: 6 - 2*3.2 };
+let moveTarget = null;
+let moveSpeed = 0.18; // viteza animatiei la mers
+let playerLegAnim = 0;
+let playerLastPos = {x: 0, z: 0};
+
+function makeCharacter(x, z, color, faceColor, name, hairColor, hairStyle, accessory, scaleY=1, showName=true, sitting=false) {
+  // Corp
+  const body = new THREE.Group();
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2*scaleY,0.7), new THREE.MeshLambertMaterial({color}));
+  torso.position.y = 1.1*scaleY;
+  body.add(torso);
+  // Cap
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.9,0.9), new THREE.MeshLambertMaterial({color: faceColor}));
+  head.position.y = 1.85*scaleY;
+  body.add(head);
+  // Picioare
+  let legY = sitting ? 0.35*scaleY : 0.35*scaleY;
+  let legZ = sitting ? 0.25 : 0;
+  let legLen = sitting ? 0.45*scaleY : 0.7*scaleY;
+  let legRot = sitting ? -Math.PI/2.2 : 0;
+  const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.28,legLen,0.28), new THREE.MeshLambertMaterial({color: 0x222}));
+  leg1.position.set(-0.3,legY,legZ);
+  leg1.rotation.x = legRot;
+  body.add(leg1);
+  const leg2 = leg1.clone();
+  leg2.position.x = 0.3;
+  body.add(leg2);
+  // Mâini
+  let armLen = sitting ? 0.55*scaleY : 0.7*scaleY;
+  let armY = sitting ? 1.25*scaleY : 1.25*scaleY;
+  let armZ = sitting ? 0.25 : 0.35;
+  let armRot = sitting ? -Math.PI/2.5 : 0;
+  const arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.22,armLen,0.22), new THREE.MeshLambertMaterial({color}));
+  arm1.position.set(-0.7,armY,armZ);
+  arm1.rotation.x = armRot;
+  body.add(arm1);
+  const arm2 = arm1.clone();
+  arm2.position.x = 0.7;
+  body.add(arm2);
+  // Par realist (cub deasupra capului) - mereu adaugă dacă există hairColor
+  if(typeof hairColor !== 'undefined' && hairColor !== null) {
+    let hairMesh;
+    if(hairStyle==='long') {
+      hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.92,0.38,0.92), new THREE.MeshLambertMaterial({color: hairColor}));
+      hairMesh.position.set(0,2.15*scaleY,0);
+    } else if(hairStyle==='bob') {
+      hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.92,0.28,0.92), new THREE.MeshLambertMaterial({color: hairColor}));
+      hairMesh.position.set(0,2.05*scaleY,0);
+    } else { // short sau orice altceva
+      hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.92,0.18,0.92), new THREE.MeshLambertMaterial({color: hairColor}));
+      hairMesh.position.set(0,2.15*scaleY,0);
+    }
+    body.add(hairMesh);
+  }
+  // Accesorii simple
+  if(accessory==='glasses') {
+    const glassMat = new THREE.MeshLambertMaterial({color:0x222});
+    const l = new THREE.Mesh(new THREE.TorusGeometry(0.18,0.04,8,16), glassMat);
+    l.position.set(-0.18,1.85*scaleY,0.47);
+    l.rotation.x = Math.PI/2;
+    body.add(l);
+    const r = l.clone();
+    r.position.x = 0.18;
+    body.add(r);
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.03,0.03), glassMat);
+    bridge.position.set(0,1.85*scaleY,0.47);
+    body.add(bridge);
+  }
+  if(accessory==='bow') {
+    const bow = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.08,0.04), new THREE.MeshLambertMaterial({color:0xe4572e}));
+    bow.position.set(0.32,2.15*scaleY,0.32);
+    body.add(bow);
+  }
+  // Poziționare
+  body.position.set(x,0.7*scaleY,z);
+  body.userData = { name: name };
+  // Nume deasupra - doar la profesor
+  if(showName && name) {
+    const div = document.createElement('div');
+    div.textContent = name;
+    div.style.position = 'absolute';
+    div.style.color = '#222';
+    div.style.fontWeight = 'bold';
+    div.style.fontSize = '1.1em';
+    div.style.pointerEvents = 'none';
+    div.style.textShadow = '0 2px 8px #fff, 0 0 2px #fff';
+    document.body.appendChild(div);
+    nameLabels.push({div, obj: body});
+  }
+  return body;
+}
+
+function updateLabels() {
+  nameLabels.forEach(({div, obj}) => {
+    const vector = obj.position.clone();
+    vector.project(camera);
+    const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-vector.y * 0.5 + 0.5) * window.innerHeight;
+    div.textContent = obj.userData && obj.userData.name ? obj.userData.name : div.textContent;
+    div.style.left = `${x-30}px`;
+    div.style.top = `${y-60}px`;
+    div.style.display = (vector.z < 1) ? 'block' : 'none';
+  });
+}
+function makeTeacher() {
+  // Profesorul are nume deasupra
+  return makeCharacter(0, -8, 0xf7b267, 0xfbeee6, 'Prof. Ionescu', null, null, null, 1, true, false);
+}
+function makePlayer() {
+  // Jucătorul nu are păr/accesorii, rămâne simplu
+  const playerObj = makeCharacter(0, 6 - 2*3.2, 0x38598b, 0xfbeee6, '', null, null, null, 1, false, false);
+  // Elimină eticheta de nume dacă există
+  if(nameLabels.length > 0) {
+    const last = nameLabels[nameLabels.length-1];
+    if(last && last.div && last.obj === playerObj) {
+      last.div.remove();
+      nameLabels.pop();
+    }
+  }
+  return playerObj;
+}
+function addClassroomWalls() {
+  // Pereți laterali
+  const wallMaterial = new THREE.MeshLambertMaterial({color:0xe0e0e0});
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(20, 7, 0.5), wallMaterial);
+  backWall.position.set(0, 3.5, -11.5);
+  scene.add(backWall);
+  const frontWall = new THREE.Mesh(new THREE.BoxGeometry(20, 7, 0.5), wallMaterial);
+  frontWall.position.set(0, 3.5, 13.5);
+  scene.add(frontWall);
+  const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 26), wallMaterial);
+  leftWall.position.set(-10, 3.5, 1);
+  scene.add(leftWall);
+  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 26), wallMaterial);
+  rightWall.position.set(10, 3.5, 1);
+  scene.add(rightWall);
+  // Tavan
+  const ceiling = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 26), new THREE.MeshLambertMaterial({color:0xf7f7f7}));
+  ceiling.position.set(0, 7, 1);
+  scene.add(ceiling);
+  // Podea cu textura de parchet maro
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 26), new THREE.MeshLambertMaterial({color:0xb98c63}));
+  floor.rotation.x = -Math.PI/2;
+  floor.position.y = 0;
+  scene.add(floor);
+  // Postere cu text 3D pe pereți
+  addPosterWithText(-6,5,-11.22,'BAC',0x8fd694);
+  addPosterWithText(6,4.7,-11.22,'INFORMATICA',0x7b9acc);
+  addPosterWithText(-9.72,4.5,0,'FORMULE',0xf9e076,Math.PI/2);
+  addPosterWithText(9.72,4.5,0,'SUCCES!',0xe4572e,-Math.PI/2);
+}
+
+function addPosterWithText(x, y, z, text, color, rotY=0) {
+  // Poster colorat
+  const poster = new THREE.Mesh(new THREE.BoxGeometry(2.8,1.1,0.05), new THREE.MeshLambertMaterial({color}));
+  poster.position.set(x,y,z);
+  poster.rotation.y = rotY;
+  scene.add(poster);
+  // Text 3D pe poster (simplu, ca mesh plane cu canvas)
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,256,64);
+  ctx.font = 'bold 32px Arial';
+  ctx.fillStyle = '#222';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text,128,32);
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.MeshBasicMaterial({map: tex, transparent:true});
+  const txtMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.5), mat);
+  txtMesh.position.set(x,y,z+0.028*Math.sign(z||1));
+  txtMesh.rotation.y = rotY;
+  scene.add(txtMesh);
+}
+function makeDesk(x, z) {
+  // Blat mai mare
+  const desk = new THREE.Group();
+  const top = new THREE.Mesh(new THREE.BoxGeometry(2.6,0.18,1.6), new THREE.MeshLambertMaterial({color:0xc2b280}));
+  top.position.y = 0.6;
+  desk.add(top);
+  // Picioare bancă
+  for(let dx of [-1.1,1.1]) for(let dz of [-0.7,0.7]) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.6,8), new THREE.MeshLambertMaterial({color:0x888888}));
+    leg.position.set(dx,0.3,dz);
+    desk.add(leg);
+  }
+  // PC pe bancă (unitate + monitor + tastatură)
+  const pcBase = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.32,0.7), new THREE.MeshLambertMaterial({color:0x222}));
+  pcBase.position.set(0.7,0.77,0.2); // pe blat, dreapta
+  desk.add(pcBase);
+  const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.48,0.32,0.05), new THREE.MeshLambertMaterial({color:0x3a86ff}));
+  monitor.position.set(0.7,0.93,0.45);
+  desk.add(monitor);
+  const keyboard = new THREE.Mesh(new THREE.BoxGeometry(0.38,0.05,0.18), new THREE.MeshLambertMaterial({color:0xbbb}));
+  keyboard.position.set(0.7,0.72,0.35);
+  desk.add(keyboard);
+  desk.position.set(x,0,z);
+  return desk;
+}
+function makeChair(x, z) {
+  const chair = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.15,0.8), new THREE.MeshLambertMaterial({color:0x8d99ae}));
+  seat.position.y = 0.2;
+  chair.add(seat);
+  // Spătar
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.6,0.1), new THREE.MeshLambertMaterial({color:0x8d99ae}));
+  back.position.set(0,0.5,-0.35);
+  chair.add(back);
+  // Picioare
+  for(let dx of [-0.35,0.35]) for(let dz of [-0.35,0.35]) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.2,8), new THREE.MeshLambertMaterial({color:0x555}));
+    leg.position.set(dx,0.1,dz);
+    chair.add(leg);
+  }
+  chair.position.set(x,0,z);
+  return chair;
+}
+function arrangeDesksAndClassmates() {
+  // 3 rânduri, 5 coloane, spațiu mai mare între bănci
+  const deskRows = 3, deskCols = 5;
+  const deskSpacingX = 3.5, deskSpacingZ = 3.2;
+  let idx = 0;
+  for(let r=0;r<deskRows;r++){
+    for(let c=0;c<deskCols;c++){
+      const x = -7 + c*deskSpacingX;
+      const z = 6 - r*deskSpacingZ;
+      // Bancă cu PC pe ea
+      const desk = makeDesk(x, z);
+      scene.add(desk);
+      // Scaun
+      const chair = makeChair(x, z-0.95);
+      scene.add(chair);
+      // Coleg pe scaun
+      if(idx<classmatesData.length) {
+        const scaleY = 0.92 + 0.18*Math.random();
+        const mate = makeCharacter(
+          x, z-0.95,
+          classmatesData[idx].color,
+          classmatesData[idx].face,
+          classmatesData[idx].name,
+          classmatesData[idx].hair,
+          classmatesData[idx].hairStyle,
+          classmatesData[idx].accessory,
+          scaleY,
+          false, // fără nume deasupra
+          true // sitting
+        );
+        mate.position.set(x, 0.2, z-0.95);
+        scene.add(mate);
+        classmates.push(mate);
+        idx++;
+      }
+    }
+  }
+}
+function addPlayerDeskAndTest() {
+  // Banca și scaunul jucătorului (rândul 3, col 3)
+  const px = 0, pz = 6 - 2*3.2;
+  const desk = makeDesk(px, pz);
+  scene.add(desk);
+  const chair = makeChair(px, pz-0.95);
+  scene.add(chair);
+  // Foaie de test
+  const paper = new THREE.Mesh(new THREE.BoxGeometry(1.2,0.02,0.8), new THREE.MeshLambertMaterial({color:0xfafafa}));
+  paper.position.set(px,0.71,pz+0.1);
+  scene.add(paper);
+  // Pix
+  const pen = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.7,12), new THREE.MeshLambertMaterial({color:0x38598b}));
+  pen.position.set(px+0.45,0.73,pz+0.25);
+  pen.rotation.z = Math.PI/8;
+  scene.add(pen);
+}
+function setThirdPersonCamera() {
+  // Camera third-person: deasupra și în spatele jucătorului
+  camera.position.set(player.position.x, 2.5, player.position.z + 4.5);
+  camera.lookAt(player.position.x, 1.2, player.position.z);
+}
+function setFirstPersonCamera() {
+  // Camera first-person/test view: pe bancă, spre foaie
+  camera.position.set(0, 1.45, 6 - 2*3.2 - 1.1);
+  camera.lookAt(0,0.71,6 - 2*3.2 + 0.2);
+}
+function showTestPaper() {
+  if (testPaperVisible) return;
+  testPaperVisible = true;
+  let testDiv = document.getElementById('test-paper');
+  if(!testDiv) {
+    testDiv = document.createElement('div');
+    testDiv.id = 'test-paper';
+    document.body.appendChild(testDiv);
+  }
+  // 5 întrebări random
+  const testQuestions = questions.slice().sort(()=>0.5-Math.random()).slice(0,5);
+  let html = '<b>Test Informatica</b><br><br>';
+  testQuestions.forEach((q,i)=>{
+    html += `<div style='margin-bottom:18px'><b>${i+1}.</b> ${q.q}<br>`;
+    q.a.forEach((ans,j)=>{
+      html += `<label style='display:block;margin-left:18px;'><input type='radio' name='q${i}' value='${j}'> ${ans}</label>`;
+    });
+    html += '</div>';
+  });
+  html += `<button id='submit-test' style='margin-top:12px;font-size:1.1em;padding:8px 24px;border-radius:8px;background:#38598b;color:#fff;border:none;cursor:pointer;'>Trimite</button>`;
+  testDiv.innerHTML = html;
+  testDiv.style.display = 'block';
+  document.getElementById('submit-test').onclick = function() {
+    let correct = 0;
+    testQuestions.forEach((q,i)=>{
+      const val = testDiv.querySelector(`input[name='q${i}']:checked`);
+      if(val && parseInt(val.value)===q.c) correct++;
+    });
+    testDiv.innerHTML = `<b>Ai răspuns corect la ${correct}/5 întrebări!</b><br><br><button onclick='location.reload()' style='font-size:1.1em;padding:8px 24px;border-radius:8px;background:#38598b;color:#fff;border:none;cursor:pointer;'>Reîncearcă</button>`;
+  };
+}
+function hideTestPaper() {
+  testPaperVisible = false;
+  const testDiv = document.getElementById('test-paper');
+  if(testDiv) testDiv.style.display = 'none';
+}
+// La fiecare 2 minute, un coleg random pune o întrebare de small talk
+setInterval(()=>{
+  if(classmates.length>0 && !gameOver) {
+    const idx = Math.floor(Math.random()*classmates.length);
+    showFunFact(classmatesData[idx].name);
+  }
+},120000);
+let askingClassmateIdx = null;
+let askingTimeout = null;
+let questionBubbleMesh = null;
+let handRaised = false;
+const informaticsQuestions = [
+  ...questions.map(q => q.q),
+  'Cât timp mai avem până la pauză?'
+];
+
+function raiseHandAndAsk() {
+  if (classmates.length === 0) return;
+  // Clear previous
+  if (askingClassmateIdx !== null) {
+    lowerHand();
+  }
+  // Pick a random classmate
+  const idx = Math.floor(Math.random() * classmates.length);
+  askingClassmateIdx = idx;
+  handRaised = true;
+  // Visually raise right arm
+  const mate = classmates[idx];
+  // Find right arm (fifth child in makeCharacter)
+  if (mate && mate.children && mate.children.length >= 6) {
+    const rightArm = mate.children[5];
+    rightArm.rotation.x = -Math.PI/1.5; // arm up
+    rightArm.position.y += 0.35; // lift arm
+    rightArm.position.z += 0.15;
+  }
+  // Pick a question
+  const q = informaticsQuestions[Math.floor(Math.random() * informaticsQuestions.length)];
+  showSpeechBubble(mate, q);
+  // Lower hand and show teacher reply after 6 seconds
+  askingTimeout = setTimeout(()=>{
+    lowerHand();
+    // Teacher reply only for pauza question
+    if(q.includes('pauză')) {
+      setTimeout(()=>{
+        showTeacherReply();
+      }, 400);
+    }
+  }, 6000);
+}
+
+function lowerHand() {
+  if (askingClassmateIdx === null) return;
+  const mate = classmates[askingClassmateIdx];
+  // Restore right arm
+  if (mate && mate.children && mate.children.length >= 6) {
+    const rightArm = mate.children[5];
+    rightArm.rotation.x = -Math.PI/2.5; // original sitting pose
+    rightArm.position.y -= 0.35;
+    rightArm.position.z -= 0.15;
+  }
+  askingClassmateIdx = null;
+  handRaised = false;
+  if (questionBubbleMesh) {
+    scene.remove(questionBubbleMesh);
+    questionBubbleMesh = null;
+  }
+  if (askingTimeout) {
+    clearTimeout(askingTimeout);
+    askingTimeout = null;
+  }
+}
+
+function showSpeechBubble(mate, text, isTeacherReply = false) {
+  // Remove previous
+  if (questionBubbleMesh) {
+    scene.remove(questionBubbleMesh);
+    questionBubbleMesh = null;
+  }
+  // Create canvas texture
+  const canvas = document.createElement('canvas');
+  canvas.width = 420; canvas.height = 80;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.strokeStyle = isTeacherReply ? '#e4572e' : '#38598b';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(4,4,412,72,18);
+  ctx.fill();
+  ctx.stroke();
+  ctx.font = 'bold 22px Arial';
+  ctx.fillStyle = '#222';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 210, 36); // move text higher
+  // Bubble tail
+  ctx.beginPath();
+  if (!isTeacherReply) {
+    ctx.moveTo(210,76);
+    ctx.lineTo(230,92);
+    ctx.lineTo(190,76);
+  } else {
+    ctx.moveTo(210,76);
+    ctx.lineTo(230,92);
+    ctx.lineTo(190,76);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.fill();
+  ctx.stroke();
+  // Three.js mesh
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.MeshBasicMaterial({map: tex, transparent:true});
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.8,0.53), mat);
+  // Position above mate's head (higher)
+  mesh.position.set(mate.position.x, mate.position.y + (isTeacherReply ? 2.7 : 2.7), mate.position.z);
+  mesh.userData._bubble = true;
+  scene.add(mesh);
+  questionBubbleMesh = mesh;
+}
+
+function showTeacherReply() {
+  // Teacher says a random number of minutes
+  const min = 2 + Math.floor(Math.random()*8); // 2-9 min
+  const reply = `Mai sunt aproximativ ${min} minute până la pauză.`;
+  showSpeechBubble(teacher, reply, true);
+  // Remove teacher reply after 4s
+  setTimeout(()=>{
+    if(questionBubbleMesh) {
+      scene.remove(questionBubbleMesh);
+      questionBubbleMesh = null;
+    }
+  }, 4000);
+}
+
+function updateSpeechBubblePosition() {
+  if (askingClassmateIdx !== null && questionBubbleMesh && classmates[askingClassmateIdx]) {
+    const mate = classmates[askingClassmateIdx];
+    questionBubbleMesh.position.set(mate.position.x, mate.position.y + 2.7, mate.position.z);
+  }
+}
+function animate() {
+  if(gameOver) return;
+  requestAnimationFrame(animate);
+  // Animatie smooth pentru jucator
+  if(moveTarget) {
+    let dx = moveTarget.x - player.position.x;
+    let dz = moveTarget.z - player.position.z;
+    let dist = Math.sqrt(dx*dx + dz*dz);
+    if(dist > 0.05) {
+      player.position.x += dx * moveSpeed;
+      player.position.z += dz * moveSpeed;
+      // Animatie picioare la mers
+      playerLegAnim += 0.18;
+      // Găsește picioarele (3 și 4)
+      if(player.children && player.children.length >= 5) {
+        const leg1 = player.children[2];
+        const leg2 = player.children[3];
+        leg1.rotation.x = Math.sin(playerLegAnim)*0.5;
+        leg2.rotation.x = -Math.sin(playerLegAnim)*0.5;
+      }
+    } else {
+      player.position.x = moveTarget.x;
+      player.position.z = moveTarget.z;
+      moveTarget = null;
+      // Picioare la poziție statică
+      if(player.children && player.children.length >= 5) {
+        const leg1 = player.children[2];
+        const leg2 = player.children[3];
+        leg1.rotation.x = 0;
+        leg2.rotation.x = 0;
+      }
+    }
+  }
+  // Camera logică: dacă ești aproape de profesor, comută la test view
+  const distToTeacher = Math.sqrt(
+    Math.pow(player.position.x - teacher.position.x, 2) +
+    Math.pow(player.position.z - teacher.position.z, 2)
+  );
+  if(distToTeacher < 3.5) {
+    setFirstPersonCamera();
+    if(!testPaperVisible) showTestPaper();
+  } else {
+    setThirdPersonCamera();
+    if(testPaperVisible) hideTestPaper();
+  }
+  updateLabels();
+  updateSpeechBubblePosition();
+  renderer.render(scene, camera);
+}
+window.addEventListener('resize',()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+window.addEventListener('keydown',function(e){
+  if(gameOver) return;
+  if(e.key==='a'||e.key==='ArrowLeft') movePlayer('left');
+  if(e.key==='d'||e.key==='ArrowRight') movePlayer('right');
+  if(e.key==='w'||e.key==='ArrowUp') movePlayer('forward');
+  if(e.key==='s'||e.key==='ArrowDown') movePlayer('back');
+});
+function movePlayer(dir) {
+  if (testPaperVisible) return;
+  // Calculează noua țintă de poziție
+  let tx = player.position.x;
+  let tz = player.position.z;
+  if(dir==='left') tx -= 1.5;
+  if(dir==='right') tx += 1.5;
+  if(dir==='forward') tz -= 1.5;
+  if(dir==='back') tz += 1.5;
+  // Permite să mergi până aproape de peretele din față (spre profesor)
+  tx = Math.max(-7, Math.min(7, tx));
+  tz = Math.max(-11, Math.min(8, tz));
+  // Setează ținta doar dacă nu e deja acolo
+  if(Math.abs(player.position.x-tx)>0.01 || Math.abs(player.position.z-tz)>0.01) {
+    moveTarget = {x: tx, z: tz};
+  }
+}
+function init3D() {
+  // Scene
+  scene = new THREE.Scene();
+  // Camera
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.setClearColor(0xcbe3f7);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  // Lighting
+  const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+  scene.add(ambient);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+  dir.position.set(5, 10, 7);
+  scene.add(dir);
+  // Classroom
+  addClassroomWalls();
+  arrangeDesksAndClassmates();
+  addPlayerDeskAndTest();
+  teacher = makeTeacher();
+  scene.add(teacher);
+  player = makePlayer();
+  scene.add(player);
+  setThirdPersonCamera();
+  // Nu afișa foaia de test la început
+}
+init3D();
+animate();
+  </script>
+</body>
+</html>

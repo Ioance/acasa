@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformă Informatică pentru Elevi</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f7f9fb;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .landing-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            object-fit: cover;
+        }
+        .landing-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #2d4059;
+            margin-bottom: 18px;
+        }
+        .landing-desc {
+            font-size: 1.25em;
+            color: #38598b;
+            margin-bottom: 36px;
+        }
+        .landing-btns {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
+        .landing-btn {
+            background: #38598b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 36px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+        }
+        .landing-btn:hover {
+            background: #092042;
+            transform: translateY(-2px) scale(1.04);
+        }
+        @media (max-width: 600px) {
+            .landing-title { font-size: 1.3em; }
+            .landing-desc { font-size: 1em; }
+            .landing-btns { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-bg"></div>
+    <div class="landing-container">
+        <img class="landing-logo" src="https://cdn.discordapp.com/attachments/1244332449874579600/1375545958569480333/d135f00b-be77-4a82-b7bb-27f5e79c1489.jpg?ex=68321480&is=6830c300&hm=cf196dd41016349c0a8d90dc4d9a177b5ff588a62ecdb84b915325c38ee385f8&" alt="Logo platformă">
+        <div class="landing-title">Învață simplu. Învață eficient. Oriunde te-ai afla.</div>
+        <div class="landing-desc">
+            Platforma gratuită de informatică pentru elevi.
+        </div>
+        <div class="landing-btns">
+            <a href="theory.html" class="landing-btn">Teorie</a>
+            <a href="problemerezolvate.html" class="landing-btn">Probleme Rezolvate</a>
+            <a href="test.html" class="landing-btn">Test</a>
+            <a href="jocuri.html" class="landing-btn" style="background:#38598b;">Joc Informatica</a>
+        </div>
+    </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+});
+// Active nav underline fix
+(function() {
+  const path = window.location.pathname;
+  document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+  if (path.endsWith('theory.html')) {
+    document.getElementById('nav-theory').classList.add('active');
+  } else if (path.endsWith('problemerezolvate.html')) {
+    document.getElementById('nav-probleme').classList.add('active');
+  } else if (path.endsWith('test.html')) {
+    document.getElementById('nav-test').classList.add('active');
+  } else if (path.endsWith('faq.html')) {
+    document.getElementById('nav-faq').classList.add('active');
+  }
+})();
+</script>
+</body>
+</html>
